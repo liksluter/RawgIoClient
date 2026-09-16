@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.rawgioclient.android.feature)
+    alias(libs.plugins.rawgioclient.unit.test)
 }
 
 android {
