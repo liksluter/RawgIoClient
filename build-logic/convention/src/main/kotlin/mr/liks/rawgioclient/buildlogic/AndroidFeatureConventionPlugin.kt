@@ -28,13 +28,6 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
 
                 add("implementation", libs.findLibrary("kotlinx-coroutines-core").get())
                 add("implementation", libs.findLibrary("kotlinx-coroutines-android").get())
-
-                add("implementation", libs.findLibrary("timber").get())
-
-                add("testImplementation", libs.findLibrary("junit").get())
-                add("testImplementation", libs.findLibrary("turbine").get())
-                add("testImplementation", libs.findLibrary("mockk").get())
-                add("testImplementation", libs.findLibrary("kotlinx-coroutines-test").get())
             }
         }
     }

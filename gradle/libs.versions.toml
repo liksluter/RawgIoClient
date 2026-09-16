@@ -51,7 +51,6 @@ roomTesting = "2.7.1"
 # Gradle plugins
 gradlePlugin = "9.1.1"
 kotlinGradlePlugin = "2.2.10"
-junit = "4.13.2"
 appcompat = "1.8.0"
 material = "1.14.0"
 
@@ -128,9 +127,6 @@ coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 # Testing — JUnit 5
-junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
-junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }
-junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit5" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 junit-platform-commons = { module = "org.junit.platform:junit-platform-commons" }
@@ -147,7 +143,6 @@ kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", ve
 compose-gradlePlugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", version.ref = "room" }
 ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
@@ -169,3 +164,4 @@ rawgioclient-android-application-compose = { id = "rawgioclient.android.applicat
 rawgioclient-android-library-compose = { id = "rawgioclient.android.library.compose" }
 rawgioclient-android-room = { id = "rawgioclient.android.room" }
 rawgioclient-kotlin-serialization = { id = "rawgioclient.kotlin.serialization" }
+rawgioclient-unit-test = { id = "rawgioclient.unit.test" }

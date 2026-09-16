@@ -48,5 +48,9 @@ gradlePlugin {
             id = libs.plugins.rawgioclient.kotlin.serialization.get().pluginId
             implementationClass = "mr.liks.rawgioclient.buildlogic.KotlinSerializationConventionPlugin"
         }
+        register("unitTest") {
+            id = libs.plugins.rawgioclient.unit.test.get().pluginId
+            implementationClass = "mr.liks.rawgioclient.buildlogic.UnitTestConventionPlugin"
+        }
     }
 }
