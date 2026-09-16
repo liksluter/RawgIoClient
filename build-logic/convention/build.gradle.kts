@@ -15,6 +15,7 @@ dependencies {
     compileOnly(libs.compose.gradlePlugin)
     implementation(libs.room.gradlePlugin)
     implementation(libs.ksp.gradlePlugin)
+    implementation("org.jetbrains.kotlin:kotlin-serialization:${libs.versions.kotlin.get()}")
     compileOnly("de.mannodermaus.gradle.plugins:android-junit5:${libs.versions.junit5Plugin.get()}")
 }
 
