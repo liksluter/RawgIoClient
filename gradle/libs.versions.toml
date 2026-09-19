@@ -47,12 +47,14 @@ mockk = "1.13.17"
 coroutinesTest = "1.10.2"
 pagingTesting = "3.4.0-rc01"
 roomTesting = "2.7.1"
+robolectric = "4.16"
 
 # Gradle plugins
 gradlePlugin = "9.1.1"
 kotlinGradlePlugin = "2.2.10"
 appcompat = "1.8.0"
 material = "1.14.0"
+techApterPlugin = "0.9.0"
 
 [libraries]
 # Kotlin
@@ -126,7 +128,7 @@ coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version
 # Logging
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
-# Testing — JUnit 5
+# Testing
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 junit-platform-commons = { module = "org.junit.platform:junit-platform-commons" }
@@ -136,6 +138,7 @@ turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutinesTest" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 
 # Gradle plugin dependencies
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "gradlePlugin" }
@@ -155,6 +158,7 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
 android-junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "junit5Plugin" }
+tech-apter-robolectric = { id = "tech.apter.junit5.jupiter.robolectric-extension-gradle-plugin", version.ref = "techApterPlugin" }
 
 # convention plugins
 rawgioclient-android-application = { id = "rawgioclient.android.application" }

@@ -30,8 +30,8 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 }
             }
 
-            extensions.configure<KotlinAndroidProjectExtension>() {
-                jvmToolchain(17)
+            extensions.configure<KotlinAndroidProjectExtension> {
+                jvmToolchain(21)
             }
         }
     }

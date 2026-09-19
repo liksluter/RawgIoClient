@@ -58,7 +58,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             }
 
             extensions.configure<KotlinAndroidProjectExtension>() {
-                jvmToolchain(17)
+                jvmToolchain(21)
             }
         }
     }
