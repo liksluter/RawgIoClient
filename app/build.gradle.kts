@@ -11,3 +11,9 @@ android {
         applicationId = "mr.liks.rawgioclient"
     }
 }
+
+dependencies {
+    implementation(project(":core:common"))
+
+    implementation(libs.koin.android)
+}
