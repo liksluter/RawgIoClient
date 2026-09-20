@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.rawgioclient.android.library)
+    alias(libs.plugins.rawgioclient.kotlin.serialization)
+    alias(libs.plugins.rawgioclient.unit.test)
 }
 
 android {
@@ -18,4 +20,11 @@ android {
             )
         }
     }
+}
+
+dependencies {
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.material.icons.extended)
 }
