@@ -6,7 +6,7 @@ import mr.liks.core.common.applocagger.AppLogger
 import mr.liks.core.common.applocagger.TimberAppLogger
 import org.koin.dsl.module
 
-val CommonModule = module {
+val AppModule = module {
     single<DispatchersProvider> { DefaultDispatchersProvider() }
     single<AppLogger> { TimberAppLogger() }
 }

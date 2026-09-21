@@ -9,7 +9,7 @@ import mr.liks.core.network.impl.client.RawgHttpClientConfig
 import org.koin.dsl.module
 import java.util.concurrent.TimeUnit
 
-val networkModule = module {
+val NetworkModule = module {
     single {
         OkHttp.create {
             config {
