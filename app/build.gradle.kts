@@ -14,6 +14,7 @@ android {
 
 dependencies {
     implementation(project(":core:common"))
+    implementation(project(":core:design-system"))
 
     implementation(libs.koin.android)
 }
