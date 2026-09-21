@@ -19,6 +19,9 @@ class AppNavigator(
     val canGoBack: Boolean
         get() = backStack.size > 1
 
+    /** @return бэкстэк */
+    fun backStack(): NavBackStack<NavKey> = backStack
+
     /** Открыть экран поверх текущего */
     fun navigate(route: AppRoute) {
         backStack.add(route)
