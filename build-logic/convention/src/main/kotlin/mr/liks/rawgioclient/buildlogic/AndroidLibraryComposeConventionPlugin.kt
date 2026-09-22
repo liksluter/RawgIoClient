@@ -9,7 +9,6 @@ import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 
 class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
-
     override fun apply(target: Project) {
         with(target) {
             pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
@@ -26,6 +25,7 @@ class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
                 val bom = libs.findLibrary("androidx-compose-bom").get()
                 add("implementation", platform(bom))
                 add("androidTestImplementation", platform(bom))
+                add("testImplementation", platform(bom))
 
                 add("implementation", libs.findLibrary("androidx-compose-ui").get())
                 add("implementation", libs.findLibrary("androidx-compose-ui-graphics").get())
@@ -36,6 +36,9 @@ class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
 
                 add("debugImplementation", libs.findLibrary("androidx-compose-ui-tooling").get())
                 add("debugImplementation", libs.findLibrary("androidx-compose-ui-tooling-preview").get())
+
+                add("testImplementation", libs.findLibrary("androidx-compose-ui-test-junit4").get())
+                add("testImplementation", libs.findLibrary("androidx-compose-ui-test-manifest").get())
             }
         }
     }

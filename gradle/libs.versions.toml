@@ -48,6 +48,7 @@ coroutinesTest = "1.10.2"
 pagingTesting = "3.4.0-rc01"
 roomTesting = "2.7.1"
 robolectric = "4.16"
+roborazzi = "1.75.0"
 
 # Gradle plugins
 gradlePlugin = "9.1.1"
@@ -55,6 +56,10 @@ kotlinGradlePlugin = "2.2.10"
 appcompat = "1.8.0"
 material = "1.14.0"
 techApterPlugin = "0.9.0"
+jetbrainsKotlinJvm = "2.2.21"
+junit4 = "4.13.2"
+
+haze = "1.5.4"
 
 [libraries]
 # Kotlin
@@ -74,9 +79,11 @@ androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = 
 androidx-compose-ui = { module = "androidx.compose.ui:ui" }
 androidx-compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
-androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 
 # Navigation 3
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
@@ -139,6 +146,9 @@ mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutinesTest" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi", version.ref = "roborazzi" }
+roborazzi-compose = { module = "io.github.takahirom.roborazzi:roborazzi-compose", version.ref = "roborazzi" }
+roborazzi-junit-rule = { module = "io.github.takahirom.roborazzi:roborazzi-junit-rule", version.ref = "roborazzi" }
 
 # Gradle plugin dependencies
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "gradlePlugin" }
@@ -148,6 +158,10 @@ room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", vers
 ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
+
+haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
+haze-materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "haze" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -159,6 +173,7 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
 android-junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "junit5Plugin" }
 tech-apter-robolectric = { id = "tech.apter.junit5.jupiter.robolectric-extension-gradle-plugin", version.ref = "techApterPlugin" }
+roborazzi-plugin = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }
 
 # convention plugins
 rawgioclient-android-application = { id = "rawgioclient.android.application" }
@@ -169,3 +184,5 @@ rawgioclient-android-library-compose = { id = "rawgioclient.android.library.comp
 rawgioclient-android-room = { id = "rawgioclient.android.room" }
 rawgioclient-kotlin-serialization = { id = "rawgioclient.kotlin.serialization" }
 rawgioclient-unit-test = { id = "rawgioclient.unit.test" }
+rawgioclient-unit-test4 = { id = "rawgioclient.unit.test4" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }

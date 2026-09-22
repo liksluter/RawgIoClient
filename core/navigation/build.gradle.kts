@@ -23,7 +23,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.navigation3.runtime)
+    api(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.material.icons.extended)

@@ -29,6 +29,8 @@ class RawgApiImplTest {
     fun `getGames sends correct parameters and parses response`() = runTest {
         val expected = GamesListResponse(
             count = 1,
+            previous = null,
+            next = "next",
             results = listOf(
                 GameListDto(1, "slug", "Name", "2023-01-01", "img", 4.5, 100, 90, 10, emptyList())
             )
@@ -54,7 +56,7 @@ class RawgApiImplTest {
 
     @Test
     fun `searchGames sends correct parameters and parses response`() = runTest {
-        val expected = GamesListResponse(count = 0, results = emptyList())
+        val expected = GamesListResponse(count = 0, previous = null, next = "next", results = emptyList())
         val responseJson = json.encodeToString(GamesListResponse.serializer(), expected)
 
         val engine = MockEngine { request ->

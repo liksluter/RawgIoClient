@@ -16,14 +16,15 @@ import androidx.room.PrimaryKey
  * @property ratingsCount кол-во голосов в рейтинге
  * @property metacritic рейтинг метакритика
  * @property playtime время игры
+ * @property feedOrder признак для сортировки
  * @property updatedAt время последнего обновления записи
  */
 @Entity(
     tableName = "games",
     indices = [
         Index("slug"),
-        Index("updatedAt"),
-        Index("name")
+        Index("name"),
+        Index("feedOrder")
     ]
 )
 data class GameEntity(
@@ -36,5 +37,6 @@ data class GameEntity(
     val ratingsCount: Int,
     val metacritic: Int?,
     val playtime: Int?,
+    val feedOrder: Long,
     val updatedAt: Long = System.currentTimeMillis()
 )
