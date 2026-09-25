@@ -53,5 +53,9 @@ gradlePlugin {
             id = libs.plugins.rawgioclient.unit.test.get().pluginId
             implementationClass = "mr.liks.rawgioclient.buildlogic.UnitTestConventionPlugin"
         }
+        register("unit4Test") {
+            id = libs.plugins.rawgioclient.unit.test4.get().pluginId
+            implementationClass = "mr.liks.rawgioclient.buildlogic.Unit4TestConventionPlugin"
+        }
     }
 }

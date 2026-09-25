@@ -13,9 +13,13 @@ android {
 }
 
 dependencies {
+    implementation(project(":feature:feed:api"))
     implementation(project(":feature:feed:impl"))
+    implementation(project(":feature:details:api"))
     implementation(project(":feature:details:impl"))
+    implementation(project(":feature:search:api"))
     implementation(project(":feature:search:impl"))
+    implementation(project(":feature:settings:api"))
     implementation(project(":feature:settings:impl"))
 
     implementation(project(":core:common"))
@@ -24,6 +28,7 @@ dependencies {
     implementation(project(":core:network:impl"))
     implementation(project(":core:database"))
     implementation(project(":core:media"))
+    implementation(project(":core:ui"))
 
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
@@ -38,4 +43,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
 
     implementation(libs.timber)
+
+    implementation(libs.haze)
+    implementation(libs.haze.materials)
 }

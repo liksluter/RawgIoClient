@@ -19,3 +19,7 @@ android {
         }
     }
 }
+
+dependencies {
+    api(project(":core:navigation"))
+}

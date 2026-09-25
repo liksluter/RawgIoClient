@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "da0a7ea5b05c9fa5f3565371e9dce8e9",
+    "identityHash": "34028837ef243c8f7ba84591dd793e37",
     "entities": [
       {
         "tableName": "games",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `slug` TEXT NOT NULL, `name` TEXT NOT NULL, `released` TEXT, `backgroundImage` TEXT, `rating` REAL NOT NULL, `ratingsCount` INTEGER NOT NULL, `metacritic` INTEGER, `playtime` INTEGER, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `slug` TEXT NOT NULL, `name` TEXT NOT NULL, `released` TEXT, `backgroundImage` TEXT, `rating` REAL NOT NULL, `ratingsCount` INTEGER NOT NULL, `metacritic` INTEGER, `playtime` INTEGER, `feedOrder` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -59,6 +59,12 @@
             "affinity": "INTEGER"
           },
           {
+            "fieldPath": "feedOrder",
+            "columnName": "feedOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "updatedAt",
             "columnName": "updatedAt",
             "affinity": "INTEGER",
@@ -82,15 +88,6 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_games_slug` ON `${TABLE_NAME}` (`slug`)"
           },
           {
-            "name": "index_games_updatedAt",
-            "unique": false,
-            "columnNames": [
-              "updatedAt"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_games_updatedAt` ON `${TABLE_NAME}` (`updatedAt`)"
-          },
-          {
             "name": "index_games_name",
             "unique": false,
             "columnNames": [
@@ -98,6 +95,15 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_games_name` ON `${TABLE_NAME}` (`name`)"
+          },
+          {
+            "name": "index_games_feedOrder",
+            "unique": false,
+            "columnNames": [
+              "feedOrder"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_games_feedOrder` ON `${TABLE_NAME}` (`feedOrder`)"
           }
         ]
       },
@@ -585,7 +591,7 @@
       },
       {
         "tableName": "remote_keys",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`gameId` INTEGER NOT NULL, `prevPage` INTEGER, `nextPage` INTEGER, PRIMARY KEY(`gameId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`gameId` INTEGER NOT NULL, `prevPage` INTEGER, `nextPage` INTEGER, `insertedAt` INTEGER NOT NULL, PRIMARY KEY(`gameId`))",
         "fields": [
           {
             "fieldPath": "gameId",
@@ -602,6 +608,12 @@
             "fieldPath": "nextPage",
             "columnName": "nextPage",
             "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "insertedAt",
+            "columnName": "insertedAt",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -655,7 +667,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'da0a7ea5b05c9fa5f3565371e9dce8e9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '34028837ef243c8f7ba84591dd793e37')"
     ]
   }
 }

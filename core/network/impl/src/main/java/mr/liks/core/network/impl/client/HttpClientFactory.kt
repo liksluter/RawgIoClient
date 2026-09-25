@@ -13,7 +13,9 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNamingStrategy
 
 /**
  * Фабрика http клиента для сервиса
@@ -21,6 +23,7 @@ import kotlinx.serialization.json.Json
  * @property engine движок клиента
  * @property config конфиг клиента для сервиса
  */
+@OptIn(ExperimentalSerializationApi::class)
 class HttpClientFactory(
     private val engine: HttpClientEngine,
     private val config: RawgHttpClientConfig
@@ -32,6 +35,7 @@ class HttpClientFactory(
         install(ContentNegotiation) {
             json(
                 Json {
+                    namingStrategy = JsonNamingStrategy.SnakeCase
                     ignoreUnknownKeys = true
                     isLenient = true
                     coerceInputValues = true

@@ -24,4 +24,7 @@ interface RemoteKeyDao {
     /** Очищает таблицу `remote_keys` */
     @Query("DELETE FROM remote_keys")
     suspend fun clearAll()
+
+    @Query("SELECT MAX(insertedAt) FROM remote_keys")
+    suspend fun maxInsertedAt(): Long?
 }

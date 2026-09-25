@@ -19,13 +19,14 @@ import mr.liks.core.database.relation.GameWithPropertiesRelation
 @Dao
 interface GameDao {
     /** @return [PagingSource] для ленты игр */
+    @Transaction
     @Query(
         """
         SELECT * FROM games
-        ORDER BY updatedAt DESC, id DESC
+        ORDER BY feedOrder ASC
         """
     )
-    fun pagingSource(): PagingSource<Int, GameEntity>
+    fun pagingSource(): PagingSource<Int, GameWithPropertiesRelation>
 
     /** @return [PagingSource] по поисковому запросу [query] */
     @Query(
@@ -89,4 +90,20 @@ interface GameDao {
     /** Очищает таблицу `genres` */
     @Query("DELETE FROM genres")
     suspend fun clearGenres()
+
+    /** Очищает таблицу `game_platform_cross_ref` */
+    @Query("DELETE FROM game_platform_cross_ref")
+    suspend fun clearPlatformCrossRefs()
+
+    /** Очищает таблицу `game_genre_cross_ref` */
+    @Query("DELETE FROM game_genre_cross_ref")
+    suspend fun clearGenreCrossRefs()
+
+    /** @return количество игр в `games` */
+    @Query("SELECT COUNT(*) FROM games")
+    suspend fun count(): Long
+
+    /** @return id игры с максимальным feedOrder или null, если игр нет */
+    @Query("SELECT id FROM games ORDER BY feedOrder DESC LIMIT 1")
+    suspend fun lastFeedGameId(): Long?
 }

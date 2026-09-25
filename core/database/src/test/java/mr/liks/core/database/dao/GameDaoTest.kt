@@ -17,38 +17,30 @@ class GameDaoTest : DatabaseTest() {
 
     @Test
     fun `upsertGames inserts games`() = runBlocking {
-        val game = GameEntity(
+        val entity = game(
             id = 1,
-            slug = "game-1",
             name = "Game 1",
+            slug = "game-1",
+            rating = 4.5
+        ).copy(
             released = "2023-01-01",
             backgroundImage = "url",
-            rating = 4.5,
             ratingsCount = 100,
             metacritic = 85,
-            playtime = 10
+            playtime = 10,
+            feedOrder = 0
         )
-        gameDao.upsertGames(listOf(game))
+        gameDao.upsertGames(listOf(entity))
         val loaded = gameDao.observeById(1).first()
         assertNotNull(loaded)
-        assertEquals(game, loaded)
+        assertEquals(entity, loaded)
     }
 
     @Test
     fun `upsertGame updates existing game`() = runBlocking {
-        val game = GameEntity(
-            id = 1,
-            slug = "game-1",
-            name = "Game 1",
-            released = "2023-01-01",
-            backgroundImage = "url",
-            rating = 4.5,
-            ratingsCount = 100,
-            metacritic = 85,
-            playtime = 10
-        )
-        gameDao.upsertGame(game)
-        val updated = game.copy(name = "Updated Game")
+        val entity = game(id = 1, name = "Game 1", slug = "game-1")
+        gameDao.upsertGame(entity)
+        val updated = entity.copy(name = "Updated Game")
         gameDao.upsertGame(updated)
         val loaded = gameDao.observeById(1).first()
         assertEquals("Updated Game", loaded?.name)
@@ -56,20 +48,10 @@ class GameDaoTest : DatabaseTest() {
 
     @Test
     fun `observeWithRelations returns game with platforms and genres`() = runBlocking {
-        val game = GameEntity(
-            id = 1,
-            slug = "game-1",
-            name = "Game 1",
-            released = "2023-01-01",
-            backgroundImage = "url",
-            rating = 4.5,
-            ratingsCount = 100,
-            metacritic = 85,
-            playtime = 10
-        )
+        val entity = game(id = 1, name = "Game 1", slug = "game-1")
         val platform = PlatformEntity(1, "PC", "pc", "img")
         val genre = GenreEntity(1, "Action", "action")
-        gameDao.upsertGame(game)
+        gameDao.upsertGame(entity)
         gameDao.upsertPlatforms(listOf(platform))
         gameDao.upsertGenres(listOf(genre))
         gameDao.insertPlatformCrossRefs(listOf(GamePlatformCrossRef(1, 1, "2023-01-01")))
@@ -77,17 +59,15 @@ class GameDaoTest : DatabaseTest() {
 
         val relation = gameDao.observeWithRelations(1).first()
         assertNotNull(relation)
-        assertEquals(game, relation?.game)
+        assertEquals(entity, relation?.game)
         assertEquals(listOf(platform), relation?.platforms)
         assertEquals(listOf(genre), relation?.genres)
     }
 
     @Test
     fun `deletePlatformRefsFor removes cross refs`() = runBlocking {
-        val game = GameEntity(1, "slug", "name", null, null, 0.0, 0, null, null)
-        val platform = PlatformEntity(1, "PC", "pc", null)
-        gameDao.upsertGame(game)
-        gameDao.upsertPlatforms(listOf(platform))
+        gameDao.upsertGame(game(1))
+        gameDao.upsertPlatforms(listOf(PlatformEntity(1, "PC", "pc", null)))
         gameDao.insertPlatformCrossRefs(listOf(GamePlatformCrossRef(1, 1, null)))
         gameDao.deletePlatformRefsFor(listOf(1))
         val relation = gameDao.observeWithRelations(1).first()
@@ -96,10 +76,8 @@ class GameDaoTest : DatabaseTest() {
 
     @Test
     fun `deleteGenreRefsFor removes cross refs`() = runBlocking {
-        val game = GameEntity(1, "slug", "name", null, null, 0.0, 0, null, null)
-        val genre = GenreEntity(1, "Action", "action")
-        gameDao.upsertGame(game)
-        gameDao.upsertGenres(listOf(genre))
+        gameDao.upsertGame(game(1))
+        gameDao.upsertGenres(listOf(GenreEntity(1, "Action", "action")))
         gameDao.insertGenreCrossRefs(listOf(GameGenreCrossRef(1, 1)))
         gameDao.deleteGenreRefsFor(listOf(1))
         val relation = gameDao.observeWithRelations(1).first()
@@ -108,7 +86,7 @@ class GameDaoTest : DatabaseTest() {
 
     @Test
     fun `clearGames removes all games`() = runBlocking {
-        gameDao.upsertGame(GameEntity(1, "slug", "name", null, null, 0.0, 0, null, null))
+        gameDao.upsertGame(game(1))
         gameDao.clearGames()
         assertNull(gameDao.observeById(1).first())
     }
@@ -117,8 +95,7 @@ class GameDaoTest : DatabaseTest() {
     fun `clearPlatforms removes all platforms`() = runBlocking {
         gameDao.upsertPlatforms(listOf(PlatformEntity(1, "PC", "pc", null)))
         gameDao.clearPlatforms()
-        val game = GameEntity(1, "slug", "name", null, null, 0.0, 0, null, null)
-        gameDao.upsertGame(game)
+        gameDao.upsertGame(game(1))
         gameDao.insertPlatformCrossRefs(listOf(GamePlatformCrossRef(1, 1, null)))
         val relation = gameDao.observeWithRelations(1).first()
         assertTrue(relation?.platforms?.isEmpty() == true)
@@ -128,50 +105,105 @@ class GameDaoTest : DatabaseTest() {
     fun `clearGenres removes all genres`() = runBlocking {
         gameDao.upsertGenres(listOf(GenreEntity(1, "Action", "action")))
         gameDao.clearGenres()
-        val game = GameEntity(1, "slug", "name", null, null, 0.0, 0, null, null)
-        gameDao.upsertGame(game)
+        gameDao.upsertGame(game(1))
         gameDao.insertGenreCrossRefs(listOf(GameGenreCrossRef(1, 1)))
         val relation = gameDao.observeWithRelations(1).first()
         assertTrue(relation?.genres?.isEmpty() == true)
     }
 
     @Test
-    fun `pagingSource returns games ordered by updatedAt DESC, id DESC`() = runBlocking {
-        val game1 = GameEntity(1, "s1", "G1", null, null, 0.0, 0, null, null, updatedAt = 1000)
-        val game2 = GameEntity(2, "s2", "G2", null, null, 0.0, 0, null, null, updatedAt = 2000)
-        val game3 = GameEntity(3, "s3", "G3", null, null, 0.0, 0, null, null, updatedAt = 2000)
-        gameDao.upsertGames(listOf(game1, game2, game3))
+    fun `clearPlatformCrossRefs removes all platform refs`() = runBlocking {
+        gameDao.upsertGame(game(1))
+        gameDao.upsertPlatforms(listOf(PlatformEntity(1, "PC", "pc", null)))
+        gameDao.insertPlatformCrossRefs(listOf(GamePlatformCrossRef(1, 1, null)))
+        gameDao.clearPlatformCrossRefs()
+        val relation = gameDao.observeWithRelations(1).first()
+        assertTrue(relation?.platforms?.isEmpty() == true)
+    }
 
-        val pagingSource = gameDao.pagingSource()
-        val loadResult = pagingSource.load(
-            PagingSource.LoadParams.Refresh(
-                key = null,
-                loadSize = 10,
-                placeholdersEnabled = false
-            )
-        )
-        assertTrue(loadResult is PagingSource.LoadResult.Page)
-        val page = loadResult as PagingSource.LoadResult.Page
-        assertEquals(listOf(3L, 2L, 1L), page.data.map { it.id })
+    @Test
+    fun `clearGenreCrossRefs removes all genre refs`() = runBlocking {
+        gameDao.upsertGame(game(1))
+        gameDao.upsertGenres(listOf(GenreEntity(1, "Action", "action")))
+        gameDao.insertGenreCrossRefs(listOf(GameGenreCrossRef(1, 1)))
+        gameDao.clearGenreCrossRefs()
+        val relation = gameDao.observeWithRelations(1).first()
+        assertTrue(relation?.genres?.isEmpty() == true)
+    }
+
+    @Test
+    fun `count returns number of games`() = runBlocking {
+        assertEquals(0L, gameDao.count())
+        gameDao.upsertGames(listOf(game(1), game(2), game(3)))
+        assertEquals(3L, gameDao.count())
+        gameDao.clearGames()
+        assertEquals(0L, gameDao.count())
+    }
+
+    @Test
+    fun `pagingSource returns games ordered by feedOrder ASC`() = runBlocking {
+        val g1 = game(id = 1, feedOrder = 30)
+        val g2 = game(id = 2, feedOrder = 10)
+        val g3 = game(id = 3, feedOrder = 20)
+        gameDao.upsertGames(listOf(g1, g2, g3))
+
+        val ids = loadRefresh(gameDao.pagingSource()).map { it.game.id }
+        assertEquals(listOf(2L, 3L, 1L), ids)
+    }
+
+    @Test
+    fun `pagingSource order stays stable after re-upsert`() = runBlocking {
+        val g1 = game(id = 1, feedOrder = 1, updatedAt = 1_000)
+        val g2 = game(id = 2, feedOrder = 2, updatedAt = 2_000)
+        gameDao.upsertGames(listOf(g1, g2))
+
+        gameDao.upsertGame(g1.copy(updatedAt = 9_999))
+
+        val ids = loadRefresh(gameDao.pagingSource()).map { it.game.id }
+        assertEquals(listOf(1L, 2L), ids)
     }
 
     @Test
     fun `searchPagingSource filters and orders by rating DESC, id DESC`() = runBlocking {
-        val game1 = GameEntity(1, "s1", "Game One", null, null, 3.0, 0, null, null)
-        val game2 = GameEntity(2, "s2", "Game Two", null, null, 5.0, 0, null, null)
-        val game3 = GameEntity(3, "s3", "Other", null, null, 4.0, 0, null, null)
-        gameDao.upsertGames(listOf(game1, game2, game3))
+        val g1 = game(id = 1, feedOrder = 1, name = "Game One", slug = "s1", rating = 3.0)
+        val g2 = game(id = 2, feedOrder = 2, name = "Game Two", slug = "s2", rating = 5.0)
+        val g3 = game(id = 3, feedOrder = 3, name = "Other",    slug = "s3", rating = 4.0)
+        gameDao.upsertGames(listOf(g1, g2, g3))
 
-        val pagingSource = gameDao.searchPagingSource("Game")
-        val loadResult = pagingSource.load(
+        val ids = loadRefresh(gameDao.searchPagingSource("Game")).map { it.id }
+        assertEquals(listOf(2L, 1L), ids)
+    }
+
+    private fun game(
+        id: Long,
+        feedOrder: Long = id,
+        name: String = "Game $id",
+        slug: String = "game-$id",
+        rating: Double = 0.0,
+        updatedAt: Long = System.currentTimeMillis()
+    ): GameEntity = GameEntity(
+        id = id,
+        slug = slug,
+        name = name,
+        released = null,
+        backgroundImage = null,
+        rating = rating,
+        ratingsCount = 0,
+        metacritic = null,
+        playtime = null,
+        feedOrder = feedOrder,
+        updatedAt = updatedAt
+    )
+
+    private fun <T : Any> loadRefresh(source: PagingSource<Int, T>): List<T> = runBlocking {
+        val result = source.load(
             PagingSource.LoadParams.Refresh(
                 key = null,
-                loadSize = 10,
+                loadSize = 50,
                 placeholdersEnabled = false
             )
         )
-        assertTrue(loadResult is PagingSource.LoadResult.Page)
-        val page = loadResult as PagingSource.LoadResult.Page
-        assertEquals(listOf(2L, 1L), page.data.map { it.id })
+        assertTrue(result is PagingSource.LoadResult.Page)
+        (result as PagingSource.LoadResult.Page).data
     }
 }

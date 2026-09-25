@@ -9,10 +9,12 @@ import androidx.room.PrimaryKey
  * @property gameId id id игры
  * @property prevPage следующая страница
  * @property nextPage предыдущая страница
+ * @property insertedAt время вставки
  */
 @Entity(tableName = "remote_keys")
 data class RemoteKeyEntity(
     @PrimaryKey val gameId: Long,
     val prevPage: Int?,
-    val nextPage: Int?
+    val nextPage: Int?,
+    val insertedAt: Long = System.currentTimeMillis()
 )
