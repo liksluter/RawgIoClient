@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.rawgioclient.android.library)
+    alias(libs.plugins.rawgioclient.kotlin.serialization)
 }
 
 android {

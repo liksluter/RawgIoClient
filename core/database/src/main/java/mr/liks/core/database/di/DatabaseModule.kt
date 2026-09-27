@@ -8,6 +8,8 @@ import mr.liks.core.database.dao.RemoteKeyDao
 import mr.liks.core.database.dao.SearchHistoryDao
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
+import timber.log.Timber
+import java.util.concurrent.Executors
 
 val DatabaseModule = module {
     single<RawgDatabase> {
@@ -17,6 +19,12 @@ val DatabaseModule = module {
             RawgDatabase.NAME
         )
             .fallbackToDestructiveMigration(dropAllTables = true) // todo только для этапа начальной разработки
+            .setQueryCallback(
+                queryCallback = { sqlQuery, bindArgs ->
+                    Timber.d("Query: $sqlQuery | Args: $bindArgs")
+                },
+                executor = Executors.newSingleThreadExecutor()
+            )
             .build()
     }
 

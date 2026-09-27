@@ -8,11 +8,15 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
+import mr.liks.core.database.entity.DeveloperEntity
+import mr.liks.core.database.entity.GameDeveloperCrossRef
 import mr.liks.core.database.entity.GameEntity
 import mr.liks.core.database.entity.GameGenreCrossRef
 import mr.liks.core.database.entity.GamePlatformCrossRef
+import mr.liks.core.database.entity.GamePublisherCrossRef
 import mr.liks.core.database.entity.GenreEntity
 import mr.liks.core.database.entity.PlatformEntity
+import mr.liks.core.database.entity.PublisherEntity
 import mr.liks.core.database.relation.GameWithPropertiesRelation
 
 /** DAO для работы с играми, платформами, жанрами и связями */
@@ -47,6 +51,54 @@ interface GameDao {
     @Query("SELECT * FROM games WHERE id = :id")
     fun observeWithRelations(id: Long): Flow<GameWithPropertiesRelation?>
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertGame(game: GameEntity): Long
+
+    @Query("""
+        UPDATE games 
+        SET slug = :slug, 
+            name = :name, 
+            released = :released, 
+            backgroundImage = :backgroundImage, 
+            rating = :rating, 
+            ratingsCount = :ratingsCount, 
+            metacritic = :metacritic, 
+            playtime = :playtime, 
+            updatedAt = :updatedAt 
+        WHERE id = :id
+    """)
+    suspend fun updateGameExceptFeedOrder(
+        id: Long,
+        slug: String,
+        name: String,
+        released: String?,
+        backgroundImage: String?,
+        rating: Double,
+        ratingsCount: Int,
+        metacritic: Int?,
+        playtime: Int?,
+        updatedAt: Long
+    )
+
+    @Transaction
+    suspend fun upsertGamePreservingFeedOrder(game: GameEntity) {
+        val result = insertGame(game)
+        if (result == -1L) {
+            updateGameExceptFeedOrder(
+                id = game.id,
+                slug = game.slug,
+                name = game.name,
+                released = game.released,
+                backgroundImage = game.backgroundImage,
+                rating = game.rating,
+                ratingsCount = game.ratingsCount,
+                metacritic = game.metacritic,
+                playtime = game.playtime,
+                updatedAt = game.updatedAt
+            )
+        }
+    }
+
     /** Вставляет/обновляет список игр из [games] */
     @Upsert
     suspend fun upsertGames(games: List<GameEntity>)
@@ -63,6 +115,14 @@ interface GameDao {
     @Upsert
     suspend fun upsertGenres(genres: List<GenreEntity>)
 
+    /** Вставляет/обновляет список разработчиков из [developers] */
+    @Upsert
+    suspend fun upsertDevelopers(developers: List<DeveloperEntity>)
+
+    /** Вставляет/обновляет список издателей из [publishers] */
+    @Upsert
+    suspend fun upsertPublishers(publishers: List<PublisherEntity>)
+
     /** Вставляет [refs] в [GamePlatformCrossRef] */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlatformCrossRefs(refs: List<GamePlatformCrossRef>)
@@ -70,6 +130,14 @@ interface GameDao {
     /** Вставляет [refs] в [GameGenreCrossRef] */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertGenreCrossRefs(refs: List<GameGenreCrossRef>)
+
+    /** Вставляет [refs] в [GameDeveloperCrossRef] */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertDeveloperCrossRefs(refs: List<GameDeveloperCrossRef>)
+
+    /** Вставляет [refs] в [GamePublisherCrossRef] */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPublisherCrossRefs(refs: List<GamePublisherCrossRef>)
 
     /** Удаляет из [GamePlatformCrossRef] на основе [gameIds] */
     @Query("DELETE FROM game_platform_cross_ref WHERE gameId IN (:gameIds)")

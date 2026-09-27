@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.rawgioclient.android.library)
+    alias(libs.plugins.rawgioclient.kotlin.serialization)
 }
 
 android {
@@ -18,4 +19,8 @@ android {
             )
         }
     }
+}
+
+dependencies {
+    api(project(":core:navigation"))
 }
