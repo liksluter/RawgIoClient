@@ -1,10 +1,10 @@
 plugins {
     alias(libs.plugins.rawgioclient.android.library)
-    alias(libs.plugins.rawgioclient.kotlin.serialization)
+    alias(libs.plugins.rawgioclient.unit.test)
 }
 
 android {
-    namespace = "mr.liks.feature.settings.api"
+    namespace = "mr.liks.datastore"
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
@@ -22,5 +22,12 @@ android {
 }
 
 dependencies {
-    api(project(":core:navigation"))
+    implementation(project(":core:common"))
+    implementation(project(":core:model"))
+
+    implementation(libs.koin.android)
+
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
 }
