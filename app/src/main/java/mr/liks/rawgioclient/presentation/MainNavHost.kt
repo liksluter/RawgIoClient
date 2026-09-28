@@ -14,6 +14,7 @@ import mr.liks.feature.details.impl.presentation.GameDetailsScreen
 import mr.liks.feature.detais.api.GameDetailsRoute
 import mr.liks.feature.feed.api.FeedRoute
 import mr.liks.feature.feed.impl.presentation.FeedScreen
+import mr.liks.feature.settings.impl.presentation.SettingsScreen
 import mr.liks.rawgioclient.presentation.component.TopBarExpandedHeight
 
 @Composable
@@ -49,7 +50,9 @@ fun MainNavHost(
                     )
                 }
                 TopLevelRoute.Search -> NavEntry(route) { }
-                TopLevelRoute.Settings -> NavEntry(route) { }
+                TopLevelRoute.Settings -> NavEntry(route) {
+                    SettingsScreen()
+                }
                 else -> error("Unknown route: $route")
             }
         }

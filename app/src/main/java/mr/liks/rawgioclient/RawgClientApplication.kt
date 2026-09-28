@@ -8,8 +8,10 @@ import mr.liks.core.database.di.DatabaseModule
 import mr.liks.core.media.di.MediaModule
 import mr.liks.core.network.impl.di.NetworkModule
 import mr.liks.core.ui.image.RawgImageLoader
+import mr.liks.datastore.di.DataStoreModule
 import mr.liks.feature.details.impl.di.DetailsModule
 import mr.liks.feature.feed.impl.di.FeedModule
+import mr.liks.feature.settings.impl.di.SettingsModule
 import mr.liks.rawgioclient.di.AppModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -38,9 +40,11 @@ class RawgClientApplication: Application(), SingletonImageLoader.Factory {
                 AppModule,
                 NetworkModule,
                 DatabaseModule,
+                DataStoreModule,
                 MediaModule,
                 FeedModule,
                 DetailsModule,
+                SettingsModule,
             )
         }
     }

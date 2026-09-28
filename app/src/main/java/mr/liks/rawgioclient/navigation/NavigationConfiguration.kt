@@ -7,6 +7,7 @@ import kotlinx.serialization.modules.polymorphic
 import mr.liks.core.navigation.TopLevelRoute
 import mr.liks.feature.detais.api.GameDetailsRoute
 import mr.liks.feature.feed.api.FeedRoute
+import mr.liks.feature.settings.api.SettingsRoute
 
 /** Настройки хранения навигации */
 val NavigationConfiguration = SavedStateConfiguration {
@@ -14,6 +15,7 @@ val NavigationConfiguration = SavedStateConfiguration {
         polymorphic(NavKey::class) {
             subclass(FeedRoute::class, FeedRoute.serializer())
             subclass(GameDetailsRoute::class, GameDetailsRoute.serializer())
+            subclass(SettingsRoute::class, SettingsRoute.serializer())
             subclass(TopLevelRoute.Feed::class, TopLevelRoute.Feed.serializer())
             subclass(TopLevelRoute.Search::class, TopLevelRoute.Search.serializer())
             subclass(TopLevelRoute.Settings::class, TopLevelRoute.Settings.serializer())
