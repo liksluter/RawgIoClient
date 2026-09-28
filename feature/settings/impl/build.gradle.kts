@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.rawgioclient.android.feature)
-    alias(libs.plugins.rawgioclient.unit.test)
+    alias(libs.plugins.rawgioclient.unit.test4)
+    alias(libs.plugins.roborazzi.plugin)
 }
 
 android {
@@ -19,6 +20,9 @@ android {
             )
         }
     }
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
 }
 
 dependencies {
@@ -28,4 +32,9 @@ dependencies {
     implementation(project(":core:datastore"))
 
     implementation(libs.androidx.datastore.preferences)
+
+    testImplementation(libs.robolectric)
+    testImplementation(libs.roborazzi)
+    testImplementation(libs.roborazzi.compose)
+    testImplementation(libs.roborazzi.junit.rule)
 }
