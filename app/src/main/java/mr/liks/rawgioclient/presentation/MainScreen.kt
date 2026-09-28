@@ -6,7 +6,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -33,6 +32,7 @@ import mr.liks.core.navigation.AppNavigator
 import mr.liks.core.navigation.AppRoute
 import mr.liks.core.navigation.TopLevelRoute
 import mr.liks.rawgioclient.R
+import mr.liks.rawgioclient.navigation.NavigationConfiguration
 import mr.liks.rawgioclient.presentation.component.BottomBar
 import mr.liks.rawgioclient.presentation.component.CollapsibleTopBar
 import mr.liks.rawgioclient.presentation.component.TopBarCollapsedHeight
@@ -43,7 +43,7 @@ import mr.liks.rawgioclient.presentation.component.shouldShowTopBar
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalHazeMaterialsApi::class)
 @Composable
 fun MainScreen(modifier: Modifier = Modifier) {
-    val backStack = rememberNavBackStack(TopLevelRoute.Feed)
+    val backStack = rememberNavBackStack(NavigationConfiguration, TopLevelRoute.Feed)
     val navigator = remember(backStack) { AppNavigator(backStack) }
     val currentRoute = backStack.lastOrNull()
     val hazeState = remember { HazeState() }
@@ -85,7 +85,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
         },
         floatingActionButton = {
             AnimatedVisibility(
-                visible = showScrollToTop,
+                visible = showScrollToTop && navigator.currentRoute == TopLevelRoute.Feed,
                 enter = fadeIn() + scaleIn(),
                 exit = fadeOut() + scaleOut(),
             ) {
@@ -104,10 +104,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 navigator = navigator,
                 hazeState = hazeState,
                 listState = listState,
-                contentPadding = PaddingValues(
-                    top = innerPadding.calculateTopPadding() + TopBarExpandedHeight,
-                    bottom = innerPadding.calculateBottomPadding(),
-                ),
+                contentPadding = innerPadding,
                 modifier = Modifier.fillMaxSize(),
             )
 

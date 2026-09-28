@@ -32,6 +32,9 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.androidx.paging.runtime)
     implementation(libs.kotlinx.coroutines.core)
+
+    implementation(libs.timber)
+
     testImplementation(libs.androidx.room.testing)
     testImplementation(libs.androidx.paging.testing)
     testImplementation(libs.robolectric)
