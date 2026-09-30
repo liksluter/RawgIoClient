@@ -39,9 +39,9 @@ fun PlatformIconRow(
         horizontalArrangement = Arrangement.spacedBy(RawgTheme.spacing.extraSmall)
     ) {
         platforms.forEach { platform ->
-            if (platform.iconUrl != null) {
+            if (platform.image != null) {
                 AsyncImage(
-                    model = platform.iconUrl,
+                    model = platform.image,
                     contentDescription = platform.name,
                     modifier = Modifier.size(ICON_SIZE),
                     contentScale = ContentScale.Fit
@@ -83,12 +83,12 @@ private val ICON_SIZE = 24.dp
 private fun PlatformIconRowPreview() {
     PlatformIconRow(
         platforms = listOf(
-            PlatformIcon(id = 1, name = "PC", iconUrl = null),
-            PlatformIcon(id = 2, name = "PlayStation 3", iconUrl = null),
-            PlatformIcon(id = 3, name = "Xbox Series S/X", iconUrl = null),
-            PlatformIcon(id = 4, name = "macOS", iconUrl = null),
-            PlatformIcon(id = 5, name = "Nintendo Switch", iconUrl = null),
-            PlatformIcon(id = 6, name = "Apple Macintosh", iconUrl = null),
+            PlatformIcon(id = 1, name = "PC", image = null),
+            PlatformIcon(id = 2, name = "PlayStation 3", image = null),
+            PlatformIcon(id = 3, name = "Xbox Series S/X", image = null),
+            PlatformIcon(id = 4, name = "macOS", image = null),
+            PlatformIcon(id = 5, name = "Nintendo Switch", image = null),
+            PlatformIcon(id = 6, name = "Apple Macintosh", image = null),
         )
     )
 }

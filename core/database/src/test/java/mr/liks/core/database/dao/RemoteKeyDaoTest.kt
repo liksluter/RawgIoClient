@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import mr.liks.core.database.entity.RemoteKeyEntity
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.assertNull
 
 /** Тесты для [RemoteKeyDao] */
@@ -11,28 +12,47 @@ class RemoteKeyDaoTest : DatabaseTest() {
     private val remoteKeyDao get() = db.remoteKeyDao()
 
     @Test
-    fun `insert and retrieve remote key`() = runBlocking {
-        val key = RemoteKeyEntity(gameId = 1, prevPage = null, nextPage = 2)
-        remoteKeyDao.insert(key)
-        val loaded = remoteKeyDao.remoteKeyById(1)
-        assertEquals(key, loaded)
-    }
-
-    @Test
-    fun `insertAll inserts multiple keys`() = runBlocking {
-        val keys = listOf(
-            RemoteKeyEntity(1, null, 2),
-            RemoteKeyEntity(2, 1, 3)
+    fun `insertKey and lastRemoteKey`() = runBlocking {
+        val key = RemoteKeyEntity(
+            ordering = "popular",
+            prevPage = null,
+            nextPage = 2,
+            insertedAt = 1_000
         )
-        remoteKeyDao.insertAll(keys)
-        assertEquals(keys[0], remoteKeyDao.remoteKeyById(1))
-        assertEquals(keys[1], remoteKeyDao.remoteKeyById(2))
+
+        remoteKeyDao.insertKey(key)
+
+        assertEquals(key, remoteKeyDao.lastRemoteKey("popular"))
     }
 
     @Test
-    fun `clearAll removes all keys`() = runBlocking {
-        remoteKeyDao.insert(RemoteKeyEntity(1, null, 2))
-        remoteKeyDao.clearAll()
-        assertNull(remoteKeyDao.remoteKeyById(1))
+    fun `insertKey replaces existing key for same ordering`() = runBlocking {
+        remoteKeyDao.insertKey(RemoteKeyEntity("popular", null, 2, 1_000))
+
+        val updated = RemoteKeyEntity("popular", 1, 3, 2_000)
+        remoteKeyDao.insertKey(updated)
+
+        assertEquals(updated, remoteKeyDao.lastRemoteKey("popular"))
+    }
+
+    @Test
+    fun `clearForOrdering removes only matching ordering`() = runBlocking {
+        remoteKeyDao.insertKey(RemoteKeyEntity("popular", null, 2, 1_000))
+        remoteKeyDao.insertKey(RemoteKeyEntity("fresh", null, 5, 2_000))
+
+        remoteKeyDao.clearForOrdering("popular")
+
+        assertNull(remoteKeyDao.lastRemoteKey("popular"))
+        assertNotNull(remoteKeyDao.lastRemoteKey("fresh"))
+    }
+
+    @Test
+    fun `insertedAt returns max for ordering`() = runBlocking {
+        remoteKeyDao.insertKey(RemoteKeyEntity("popular", null, 1, 1_000))
+        remoteKeyDao.insertKey(RemoteKeyEntity("popular", 1, 2, 3_000))
+        remoteKeyDao.insertKey(RemoteKeyEntity("fresh", null, 1, 5_000))
+
+        assertEquals(3_000L, remoteKeyDao.insertedAt("popular"))
+        assertNull(remoteKeyDao.insertedAt("missing"))
     }
 }

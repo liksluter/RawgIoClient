@@ -5,10 +5,10 @@ package mr.liks.core.model
  *
  * @property id платформы
  * @property name название
- * @property iconUrl URL иконки
+ * @property image лого платформы
  */
 data class PlatformIcon(
     val id: Long,
     val name: String,
-    val iconUrl: String?
+    val image: String?
 )

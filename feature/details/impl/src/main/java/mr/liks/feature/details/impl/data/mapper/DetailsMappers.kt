@@ -49,7 +49,8 @@ fun PublisherDto.toEntity(): PublisherEntity = PublisherEntity(
 fun GenreDto.toEntity(): GenreEntity = GenreEntity(
     id = id,
     name = name,
-    slug = slug
+    slug = slug,
+    gamesCount = gamesCount
 )
 
 /** Маппер [PlatformDto] (сеть) -> [PlatformEntity] (БД) */
@@ -57,7 +58,6 @@ fun PlatformDto.toEntity(): PlatformEntity = PlatformEntity(
     id = id,
     name = name,
     slug = slug,
-    imageBackground = imageBackground
 )
 
 /** Маппер [MovieDto] (сеть) -> [TrailerEntity] (БД) */
@@ -110,5 +110,5 @@ fun GenreEntity.toDomain(): Genre = Genre(id = id, name = name)
 fun PlatformEntity.toDomain(): PlatformIcon = PlatformIcon(
     id = id,
     name = name,
-    iconUrl = imageBackground
+    image = image
 )

@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "34028837ef243c8f7ba84591dd793e37",
+    "identityHash": "a2c6cde73679fb3a5ccc0b1abf947df8",
     "entities": [
       {
         "tableName": "games",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `slug` TEXT NOT NULL, `name` TEXT NOT NULL, `released` TEXT, `backgroundImage` TEXT, `rating` REAL NOT NULL, `ratingsCount` INTEGER NOT NULL, `metacritic` INTEGER, `playtime` INTEGER, `feedOrder` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `slug` TEXT NOT NULL, `name` TEXT NOT NULL, `released` TEXT, `backgroundImage` TEXT, `rating` REAL NOT NULL, `ratingsCount` INTEGER NOT NULL, `metacritic` INTEGER, `playtime` INTEGER, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -59,12 +59,6 @@
             "affinity": "INTEGER"
           },
           {
-            "fieldPath": "feedOrder",
-            "columnName": "feedOrder",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
             "fieldPath": "updatedAt",
             "columnName": "updatedAt",
             "affinity": "INTEGER",
@@ -95,21 +89,146 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_games_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ]
+      },
+      {
+        "tableName": "feed_entries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ordering` TEXT NOT NULL, `gameId` INTEGER NOT NULL, `sortValue` REAL NOT NULL, `secondarySort` INTEGER NOT NULL, PRIMARY KEY(`ordering`, `gameId`), FOREIGN KEY(`gameId`) REFERENCES `games`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "ordering",
+            "columnName": "ordering",
+            "affinity": "TEXT",
+            "notNull": true
           },
           {
-            "name": "index_games_feedOrder",
+            "fieldPath": "gameId",
+            "columnName": "gameId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sortValue",
+            "columnName": "sortValue",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "secondarySort",
+            "columnName": "secondarySort",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "ordering",
+            "gameId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_feed_entries_ordering",
             "unique": false,
             "columnNames": [
-              "feedOrder"
+              "ordering"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_games_feedOrder` ON `${TABLE_NAME}` (`feedOrder`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_feed_entries_ordering` ON `${TABLE_NAME}` (`ordering`)"
+          },
+          {
+            "name": "index_feed_entries_gameId",
+            "unique": false,
+            "columnNames": [
+              "gameId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_feed_entries_gameId` ON `${TABLE_NAME}` (`gameId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "games",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "gameId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "search_entries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`query` TEXT NOT NULL, `gameId` INTEGER NOT NULL, `position` INTEGER NOT NULL, PRIMARY KEY(`query`, `gameId`), FOREIGN KEY(`gameId`) REFERENCES `games`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "query",
+            "columnName": "query",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gameId",
+            "columnName": "gameId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "query",
+            "gameId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_search_entries_query",
+            "unique": false,
+            "columnNames": [
+              "query"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_search_entries_query` ON `${TABLE_NAME}` (`query`)"
+          },
+          {
+            "name": "index_search_entries_gameId",
+            "unique": false,
+            "columnNames": [
+              "gameId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_search_entries_gameId` ON `${TABLE_NAME}` (`gameId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "games",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "gameId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
           }
         ]
       },
       {
         "tableName": "platforms",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `slug` TEXT NOT NULL, `imageBackground` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `slug` TEXT NOT NULL, `image` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -130,8 +249,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "imageBackground",
-            "columnName": "imageBackground",
+            "fieldPath": "image",
+            "columnName": "image",
             "affinity": "TEXT"
           }
         ],
@@ -185,7 +304,7 @@
       },
       {
         "tableName": "genres",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `slug` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `slug` TEXT NOT NULL, `gamesCount` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -204,6 +323,11 @@
             "columnName": "slug",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "gamesCount",
+            "columnName": "gamesCount",
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -590,13 +714,13 @@
         ]
       },
       {
-        "tableName": "remote_keys",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`gameId` INTEGER NOT NULL, `prevPage` INTEGER, `nextPage` INTEGER, `insertedAt` INTEGER NOT NULL, PRIMARY KEY(`gameId`))",
+        "tableName": "feed_remote_keys",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ordering` TEXT NOT NULL, `prevPage` INTEGER, `nextPage` INTEGER, `insertedAt` INTEGER NOT NULL, PRIMARY KEY(`ordering`))",
         "fields": [
           {
-            "fieldPath": "gameId",
-            "columnName": "gameId",
-            "affinity": "INTEGER",
+            "fieldPath": "ordering",
+            "columnName": "ordering",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -619,7 +743,7 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "gameId"
+            "ordering"
           ]
         }
       },
@@ -667,7 +791,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '34028837ef243c8f7ba84591dd793e37')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a2c6cde73679fb3a5ccc0b1abf947df8')"
     ]
   }
 }

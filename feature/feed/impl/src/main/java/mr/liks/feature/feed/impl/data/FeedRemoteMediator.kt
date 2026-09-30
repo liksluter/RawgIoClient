@@ -6,11 +6,13 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import mr.liks.core.database.RawgDatabase
+import mr.liks.core.database.entity.GamePlatformCrossRef
 import mr.liks.core.database.entity.RemoteKeyEntity
 import mr.liks.core.database.relation.GameWithPropertiesRelation
 import mr.liks.core.network.api.RawgApi
-import mr.liks.feature.feed.impl.data.mapper.platformCrossRef
+import mr.liks.core.network.api.SortOrder
 import mr.liks.feature.feed.impl.data.mapper.toEntity
+import mr.liks.feature.feed.impl.data.mapper.toFeedEntry
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -19,18 +21,22 @@ import java.util.concurrent.TimeUnit
  *
  * @property api контракт API [RawgApi]
  * @property database инстанс БД
+ * @property ordering признак сортировки
  * @property pageSize размер страницы
  */
 @OptIn(ExperimentalPagingApi::class)
 class FeedRemoteMediator(
     private val api: RawgApi,
     private val database: RawgDatabase,
-    private val pageSize: Int
+    private val sortOrder: SortOrder,
+    private val reverseSortOrder: Boolean,
+    private val pageSize: Int,
 ) : RemoteMediator<Int, GameWithPropertiesRelation>() {
+    private val ordering = sortOrder.getOrdering(reverseSortOrder)
 
     override suspend fun initialize(): InitializeAction {
         val timeout = TimeUnit.HOURS.toMillis(1)
-        val last = database.remoteKeyDao().maxInsertedAt()
+        val last = database.remoteKeyDao().insertedAt(ordering)
         return if (last == null || System.currentTimeMillis() - last >= timeout)
             InitializeAction.LAUNCH_INITIAL_REFRESH
         else
@@ -43,17 +49,11 @@ class FeedRemoteMediator(
     ): MediatorResult {
         val page = when (loadType) {
             LoadType.REFRESH -> 1
-            LoadType.PREPEND ->
-                return MediatorResult.Success(endOfPaginationReached = true)
+            LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
             LoadType.APPEND -> {
-                val remoteKeys = getRemoteKeyForLastItem(state)
-
-                if (remoteKeys == null) {
-                    val dbHasData = database.gameDao().count() > 0
-                    return MediatorResult.Success(endOfPaginationReached = !dbHasData)
-                }
-
-                remoteKeys.nextPage
+                val lastKey = database.remoteKeyDao().lastRemoteKey(ordering)
+                    ?: return MediatorResult.Success(endOfPaginationReached = true)
+                lastKey.nextPage
                     ?: return MediatorResult.Success(endOfPaginationReached = true)
             }
         }
@@ -62,21 +62,21 @@ class FeedRemoteMediator(
             val response = api.getGames(
                 page = page,
                 pageSize = pageSize,
-                ordering = ORDERING
+                sortOrder = sortOrder,
+                reverseSortOrder = reverseSortOrder
             )
             val endOfPaginationReached = response.next == null
 
             database.withTransaction {
                 if (loadType == LoadType.REFRESH) {
-                    database.remoteKeyDao().clearAll()
-                    database.gameDao().clearGames()
-                    database.gameDao().clearPlatforms()
+                    database.remoteKeyDao().clearForOrdering(ordering)
+                    database.gameDao().clearFeedEntries(ordering)
                 }
 
-                database.gameDao().upsertGames(response.results.mapIndexed {  index, dto ->
-                    val feedOrder = (page - 1L) * pageSize + index
-                    dto.toEntity(feedOrder)
-                })
+                database.gameDao().upsertGames(response.results.map { it.toEntity() })
+                database.gameDao().upsertFeedEntries(
+                    response.results.map { it.toFeedEntry(ordering) }
+                )
 
                 val platforms = response.results
                     .flatMap { it.platforms }
@@ -88,21 +88,20 @@ class FeedRemoteMediator(
 
                 val refs = response.results.flatMap { game ->
                     game.platforms.map { wrapper ->
-                        platformCrossRef(game.id, wrapper.platform.id, wrapper.releasedAt)
+                        GamePlatformCrossRef(game.id, wrapper.platform.id, wrapper.releasedAt)
                     }
                 }
                 if (refs.isNotEmpty()) {
-                    database.gameDao().insertPlatformCrossRefs(refs)
+                    database.gameDao().upsertPlatformCrossRefs(refs)
                 }
 
-                val remoteKeys = response.results.map { game ->
+                database.remoteKeyDao().insertKey(
                     RemoteKeyEntity(
-                        gameId = game.id,
+                        ordering = ordering,
                         prevPage = if (page <= 1) null else page - 1,
-                        nextPage = if (endOfPaginationReached) null else page + 1
+                        nextPage = if (endOfPaginationReached) null else page + 1,
                     )
-                }
-                database.remoteKeyDao().insertAll(remoteKeys)
+                )
             }
 
             MediatorResult.Success(endOfPaginationReached)
@@ -110,22 +109,5 @@ class FeedRemoteMediator(
             Timber.w(t, "FeedRemoteMediator failed at page %d, type %s", page, loadType)
             MediatorResult.Error(t)
         }
-    }
-
-    private suspend fun getRemoteKeyForLastItem(
-        state: PagingState<Int, GameWithPropertiesRelation>
-    ): RemoteKeyEntity? {
-        val fromState = state.pages
-            .lastOrNull { it.data.isNotEmpty() }
-            ?.data?.lastOrNull()
-            ?.game?.id
-
-        val id = fromState ?: database.gameDao().lastFeedGameId() ?: return null
-
-        return database.remoteKeyDao().remoteKeyById(id)
-    }
-
-    private companion object {
-        const val ORDERING = "-added"
     }
 }

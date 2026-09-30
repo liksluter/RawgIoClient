@@ -65,7 +65,7 @@ fun GameFeedCard(
             Spacer(Modifier.height(RawgTheme.spacing.small))
 
             Text(
-                text = "${game.feedOrder} ${game.name}", // todo для тестов, убрать после стабилизации
+                text = game.name,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
@@ -142,7 +142,7 @@ private fun MetaRow(
             } ?: run {
                 game.platforms.forEach { platform ->
                     AsyncImage(
-                        model = platform.iconUrl,
+                        model = platform.image,
                         contentDescription = platform.name,
                         modifier = Modifier.size(24.dp),
                         contentScale = ContentScale.Fit

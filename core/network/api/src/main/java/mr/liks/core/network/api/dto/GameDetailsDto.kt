@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
  * Dto детальной информации об игре
  *
  * @property id id
- * @property slug
+ * @property slug слаг
  * @property name название
  * @property description описание
  * @property descriptionRaw the description raw

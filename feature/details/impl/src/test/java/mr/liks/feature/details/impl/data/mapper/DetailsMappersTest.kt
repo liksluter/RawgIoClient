@@ -3,7 +3,6 @@ package mr.liks.feature.details.impl.data.mapper
 import io.mockk.every
 import io.mockk.mockk
 import mr.liks.core.database.entity.DeveloperEntity
-import mr.liks.core.database.entity.GameDetailsEntity
 import mr.liks.core.database.entity.GenreEntity
 import mr.liks.core.database.entity.PlatformEntity
 import mr.liks.core.database.entity.PublisherEntity
@@ -23,6 +22,7 @@ import mr.liks.core.network.api.dto.PlatformDto
 import mr.liks.core.network.api.dto.PublisherDto
 import mr.liks.core.network.api.dto.ScreenshotDto
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 /** Тесты на мапперов из DetailsMappers.kt */
@@ -84,6 +84,7 @@ class DetailsMappersTest {
             every { id } returns 3L
             every { name } returns "RPG"
             every { slug } returns "rpg"
+            every { gamesCount } returns null
         }
 
         val entity = dto.toEntity()
@@ -91,6 +92,7 @@ class DetailsMappersTest {
         assertEquals(3L, entity.id)
         assertEquals("RPG", entity.name)
         assertEquals("rpg", entity.slug)
+        assertNull(entity.gamesCount)
     }
 
     @Test
@@ -99,7 +101,7 @@ class DetailsMappersTest {
             every { id } returns 4L
             every { name } returns "PC"
             every { slug } returns "pc"
-            every { imageBackground } returns "icon"
+            every { image } returns "icon"
         }
 
         val entity = dto.toEntity()
@@ -107,7 +109,7 @@ class DetailsMappersTest {
         assertEquals(4L, entity.id)
         assertEquals("PC", entity.name)
         assertEquals("pc", entity.slug)
-        assertEquals("icon", entity.imageBackground)
+        assertNull(entity.image)
     }
 
     @Test
@@ -232,7 +234,7 @@ class DetailsMappersTest {
             id = 1L,
             name = "PC",
             slug = "pc",
-            imageBackground = "icon"
+            image = "icon"
         )
 
         val domain = entity.toDomain()
@@ -241,7 +243,7 @@ class DetailsMappersTest {
             PlatformIcon(
                 id = 1L,
                 name = "PC",
-                iconUrl = "icon"
+                image = "icon"
             ),
             domain
         )

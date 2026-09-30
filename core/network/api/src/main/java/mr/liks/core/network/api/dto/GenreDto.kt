@@ -8,10 +8,12 @@ import kotlinx.serialization.Serializable
  * @property id id
  * @property name название
  * @property slug
+ * @property gamesCount кол-во игр
  */
 @Serializable
 data class GenreDto(
     val id: Long,
     val name: String,
-    val slug: String
+    val slug: String,
+    val gamesCount: Int?,
 )

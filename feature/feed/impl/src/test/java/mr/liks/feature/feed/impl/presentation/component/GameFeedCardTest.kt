@@ -28,9 +28,10 @@ class GameFeedCardTest {
         rating = 4.5,
         platforms = listOf(PlatformIcon(1L, "PC", "pc.png")),
         platformsNames = "PC",
-        feedOrder = 0L,
         trailerUrl = null,
-        trailerPreview = null
+        trailerPreview = null,
+        released = null,
+        genres = null
     )
 
     @Test

@@ -9,12 +9,12 @@ import androidx.room.PrimaryKey
  * @property id id
  * @property name название
  * @property slug слаг
- * @property imageBackground лого платформы
+ * @property image лого платформы
  */
 @Entity(tableName = "platforms")
 data class PlatformEntity(
     @PrimaryKey val id: Long,
     val name: String,
     val slug: String,
-    val imageBackground: String?
+    val image: String? = null
 )

@@ -15,8 +15,10 @@ import kotlinx.coroutines.test.runTest
 import mr.liks.core.database.RawgDatabase
 import mr.liks.core.database.dao.GameDao
 import mr.liks.core.database.dao.RemoteKeyDao
+import mr.liks.core.database.entity.RemoteKeyEntity
 import mr.liks.core.database.relation.GameWithPropertiesRelation
 import mr.liks.core.network.api.RawgApi
+import mr.liks.core.network.api.SortOrder
 import mr.liks.core.network.api.dto.GameListDto
 import mr.liks.core.network.api.dto.GamesListResponse
 import mr.liks.core.network.api.dto.PlatformDto
@@ -51,7 +53,13 @@ class FeedRemoteMediatorTest {
             block.invoke()
         }
 
-        mediator = FeedRemoteMediator(api, database, pageSize = PAGE_SIZE)
+        mediator = FeedRemoteMediator(
+            api = api,
+            database = database,
+            sortOrder = SortOrder.RATING,
+            reverseSortOrder = true,
+            pageSize = PAGE_SIZE
+        )
     }
 
     @After
@@ -61,23 +69,41 @@ class FeedRemoteMediatorTest {
 
     @Test
     fun `initialize returns LAUNCH_INITIAL_REFRESH when no last insert`() = runTest {
-        coEvery { remoteKeyDao.maxInsertedAt() } returns null
-        val action = mediator.initialize()
-        assertEquals(RemoteMediator.InitializeAction.LAUNCH_INITIAL_REFRESH, action)
+        coEvery { remoteKeyDao.insertedAt(any()) } returns null
+        assertEquals(
+            RemoteMediator.InitializeAction.LAUNCH_INITIAL_REFRESH,
+            mediator.initialize()
+        )
     }
 
     @Test
     fun `initialize returns SKIP_INITIAL_REFRESH when recent insert`() = runTest {
-        coEvery { remoteKeyDao.maxInsertedAt() } returns System.currentTimeMillis()
-        val action = mediator.initialize()
-        assertEquals(RemoteMediator.InitializeAction.SKIP_INITIAL_REFRESH, action)
+        coEvery { remoteKeyDao.insertedAt(any()) } returns System.currentTimeMillis()
+        assertEquals(
+            RemoteMediator.InitializeAction.SKIP_INITIAL_REFRESH,
+            mediator.initialize()
+        )
+    }
+
+    @Test
+    fun `initialize returns LAUNCH_INITIAL_REFRESH when insert is stale`() = runTest {
+        val twoHoursAgo = System.currentTimeMillis() - 2 * 60 * 60 * 1000L
+        coEvery { remoteKeyDao.insertedAt(any()) } returns twoHoursAgo
+        assertEquals(
+            RemoteMediator.InitializeAction.LAUNCH_INITIAL_REFRESH,
+            mediator.initialize()
+        )
     }
 
     @Test
     fun `load REFRESH fetches first page and saves data`() = runTest {
-        // given
         coEvery {
-            api.getGames(page = 1, pageSize = PAGE_SIZE, ordering = "-added")
+            api.getGames(
+                page = 1,
+                pageSize = PAGE_SIZE,
+                sortOrder = any(),
+                reverseSortOrder = any()
+            )
         } returns GamesListResponse(
             count = 1,
             next = null,
@@ -87,29 +113,28 @@ class FeedRemoteMediatorTest {
 
         val result = mediator.load(LoadType.REFRESH, emptyState())
 
-        val success = when (result) {
-            is RemoteMediator.MediatorResult.Success -> result
-            is RemoteMediator.MediatorResult.Error ->
-                throw AssertionError("Mediator returned Error", result.throwable)
-        }
-        assertTrue(
-            "endOfPaginationReached should be true because next == null",
-            success.endOfPaginationReached
-        )
+        val success = result as? RemoteMediator.MediatorResult.Success
+            ?: throw AssertionError("Mediator returned $result")
+        assertTrue(success.endOfPaginationReached)
 
-        coVerify { remoteKeyDao.clearAll() }
-        coVerify { gameDao.clearGames() }
-        coVerify { gameDao.clearPlatforms() }
+        coVerify { remoteKeyDao.clearForOrdering(any()) }
+        coVerify { gameDao.clearFeedEntries(any()) }
         coVerify { gameDao.upsertGames(any()) }
+        coVerify { gameDao.upsertFeedEntries(any()) }
         coVerify { gameDao.upsertPlatforms(any()) }
-        coVerify { gameDao.insertPlatformCrossRefs(any()) }
-        coVerify { remoteKeyDao.insertAll(any()) }
+        coVerify { gameDao.upsertPlatformCrossRefs(any()) }
+        coVerify { remoteKeyDao.insertKey(any()) }
     }
 
     @Test
     fun `load REFRESH marks endOfPaginationReached false when next is not null`() = runTest {
         coEvery {
-            api.getGames(page = 1, pageSize = PAGE_SIZE, ordering = "-added")
+            api.getGames(
+                page = 1,
+                pageSize = PAGE_SIZE,
+                sortOrder = any(),
+                reverseSortOrder = any()
+            )
         } returns GamesListResponse(
             count = 1,
             next = "https://api.rawg.io/api/games?page=2",
@@ -119,19 +144,14 @@ class FeedRemoteMediatorTest {
 
         val result = mediator.load(LoadType.REFRESH, emptyState())
 
-        val success = when (result) {
-            is RemoteMediator.MediatorResult.Success -> result
-            is RemoteMediator.MediatorResult.Error ->
-                throw AssertionError("Mediator returned Error", result.throwable)
-        }
+        val success = result as? RemoteMediator.MediatorResult.Success
+            ?: throw AssertionError("Mediator returned $result")
         assertEquals(false, success.endOfPaginationReached)
     }
 
     @Test
-    fun `load APPEND returns end when no remote key and db has no data`() = runTest {
-        coEvery { remoteKeyDao.remoteKeyById(any()) } returns null
-        coEvery { gameDao.lastFeedGameId() } returns null
-        coEvery { gameDao.count() } returns 0
+    fun `load APPEND returns end when no remote key`() = runTest {
+        coEvery { remoteKeyDao.lastRemoteKey(any()) } returns null
 
         val result = mediator.load(LoadType.APPEND, emptyState())
 
@@ -141,28 +161,33 @@ class FeedRemoteMediatorTest {
     }
 
     @Test
-    fun `load APPEND returns not end when no remote key but db has data`() = runTest {
-        coEvery { remoteKeyDao.remoteKeyById(any()) } returns null
-        coEvery { gameDao.lastFeedGameId() } returns null
-        coEvery { gameDao.count() } returns 5
+    fun `load APPEND returns end when remote key has no nextPage`() = runTest {
+        coEvery { remoteKeyDao.lastRemoteKey(any()) } returns
+                RemoteKeyEntity(ordering = "test", prevPage = 1, nextPage = null)
 
         val result = mediator.load(LoadType.APPEND, emptyState())
 
         val success = result as? RemoteMediator.MediatorResult.Success
             ?: error("Expected Success but was $result")
-        assertEquals(false, success.endOfPaginationReached)
+        assertTrue(success.endOfPaginationReached)
     }
 
     @Test
-    fun `load APPEND returns end when remote key has no nextPage`() = runTest {
-        coEvery { remoteKeyDao.remoteKeyById(any()) } returns
-                mr.liks.core.database.entity.RemoteKeyEntity(
-                    gameId = 1L, prevPage = null, nextPage = null
-                )
-        coEvery { gameDao.lastFeedGameId() } returns 1L
+    fun `load APPEND fetches next page when remote key has nextPage`() = runTest {
+        coEvery { remoteKeyDao.lastRemoteKey(any()) } returns
+                RemoteKeyEntity(ordering = "test", prevPage = 1, nextPage = 3)
+        coEvery {
+            api.getGames(
+                page = 3,
+                pageSize = PAGE_SIZE,
+                sortOrder = any(),
+                reverseSortOrder = any()
+            )
+        } returns GamesListResponse(
+            count = 0, next = null, previous = null, results = emptyList()
+        )
 
         val result = mediator.load(LoadType.APPEND, emptyState())
-
         val success = result as? RemoteMediator.MediatorResult.Success
             ?: error("Expected Success but was $result")
         assertTrue(success.endOfPaginationReached)
@@ -179,7 +204,7 @@ class FeedRemoteMediatorTest {
 
     @Test
     fun `load returns Error when api throws`() = runTest {
-        coEvery { api.getGames(any(), any(), any()) } throws RuntimeException("Network")
+        coEvery { api.getGames(any(), any(), any(), any()) } throws RuntimeException("Network")
 
         val result = mediator.load(LoadType.REFRESH, emptyState())
 

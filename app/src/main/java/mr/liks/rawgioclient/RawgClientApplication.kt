@@ -11,6 +11,7 @@ import mr.liks.core.ui.image.RawgImageLoader
 import mr.liks.datastore.di.DataStoreModule
 import mr.liks.feature.details.impl.di.DetailsModule
 import mr.liks.feature.feed.impl.di.FeedModule
+import mr.liks.feature.search.impl.di.SearchModule
 import mr.liks.feature.settings.impl.di.SettingsModule
 import mr.liks.rawgioclient.di.AppModule
 import org.koin.android.ext.koin.androidContext
@@ -44,6 +45,7 @@ class RawgClientApplication: Application(), SingletonImageLoader.Factory {
                 MediaModule,
                 FeedModule,
                 DetailsModule,
+                SearchModule,
                 SettingsModule,
             )
         }
