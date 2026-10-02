@@ -6,6 +6,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
@@ -20,6 +21,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import kotlin.time.Duration.Companion.seconds
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SettingsRepositoryImplTest {
     private val dataStore: SettingsDataStore = mockk(relaxed = true)
     private val cacheManager: CacheManager = mockk(relaxed = true)

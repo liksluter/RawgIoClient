@@ -39,20 +39,6 @@ class VideoCacheTest {
     }
 
     @Test
-    fun `get creates SimpleCache`() {
-        val cache = VideoCache.get(context)
-        assertNotNull(cache)
-        assertTrue(cache is SimpleCache)
-    }
-
-    @Test
-    fun `cacheDataSourceFactory returns factory`() {
-        val factory: DataSource.Factory = VideoCache.cacheDataSourceFactory(context)
-        assertNotNull(factory)
-        assertTrue(factory is DataSource.Factory)
-    }
-
-    @Test
     fun `cacheDataSourceFactory uses the same cache instance`() {
         VideoCache.cacheDataSourceFactory(context)
         assertNotNull(VideoCache.get(context))

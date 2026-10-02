@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import mr.liks.core.database.entity.DeveloperEntity
+import mr.liks.core.database.entity.FeedEntryEntity
 import mr.liks.core.database.entity.GameDeveloperCrossRef
 import mr.liks.core.database.entity.GameEntity
 import mr.liks.core.database.entity.GameGenreCrossRef
@@ -17,161 +18,152 @@ import mr.liks.core.database.entity.GamePublisherCrossRef
 import mr.liks.core.database.entity.GenreEntity
 import mr.liks.core.database.entity.PlatformEntity
 import mr.liks.core.database.entity.PublisherEntity
+import mr.liks.core.database.entity.SearchEntryEntity
 import mr.liks.core.database.relation.GameWithPropertiesRelation
 
 /** DAO для работы с играми, платформами, жанрами и связями */
 @Dao
 interface GameDao {
-    /** @return [PagingSource] для ленты игр */
+    /** @return PagingSource ленты по признаку сортировки [ordering] */
     @Transaction
     @Query(
         """
-        SELECT * FROM games
-        ORDER BY feedOrder ASC
+        SELECT g.* FROM games g
+        INNER JOIN feed_entries f ON f.gameId = g.id
+        WHERE f.ordering = :ordering
+        ORDER BY f.sortValue ASC, f.secondarySort ASC
         """
     )
-    fun pagingSource(): PagingSource<Int, GameWithPropertiesRelation>
+    fun feedPagingSource(ordering: String): PagingSource<Int, GameWithPropertiesRelation>
 
-    /** @return [PagingSource] по поисковому запросу [query] */
+    @Upsert
+    suspend fun upsertFeedEntries(entries: List<FeedEntryEntity>)
+
+    @Query("DELETE FROM feed_entries WHERE ordering = :ordering")
+    suspend fun clearFeedEntries(ordering: String)
+
+    @Transaction
     @Query(
         """
-        SELECT * FROM games
-        WHERE name LIKE '%' || :query || '%'
-        ORDER BY rating DESC, id DESC
+        SELECT g.* FROM games g
+        INNER JOIN search_entries s ON s.gameId = g.id
+        WHERE s.query = :query
+        ORDER BY s.position ASC
         """
     )
-    fun searchPagingSource(query: String): PagingSource<Int, GameEntity>
+    fun searchPagingSource(query: String): PagingSource<Int, GameWithPropertiesRelation>
 
-    /** @return [Flow] для наблюдения за одной игрой с идентфиикатором [id] */
+    @Upsert
+    suspend fun upsertSearchEntries(entries: List<SearchEntryEntity>)
+
+    @Query("DELETE FROM search_entries WHERE query = :query")
+    suspend fun clearSearchEntries(query: String)
+
+    @Query("DELETE FROM search_entries WHERE query NOT IN (:activeQueries)")
+    suspend fun clearSearchEntriesExcept(activeQueries: List<String>)
+
     @Query("SELECT * FROM games WHERE id = :id")
     fun observeById(id: Long): Flow<GameEntity?>
 
-    /** @return [Flow] для наблюдения за связью [GameWithPropertiesRelation] по идентификатору [id] */
     @Transaction
     @Query("SELECT * FROM games WHERE id = :id")
     fun observeWithRelations(id: Long): Flow<GameWithPropertiesRelation?>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertGame(game: GameEntity): Long
+    @Upsert
+    suspend fun upsertGames(games: List<GameEntity>)
 
-    @Query("""
-        UPDATE games 
-        SET slug = :slug, 
-            name = :name, 
-            released = :released, 
-            backgroundImage = :backgroundImage, 
-            rating = :rating, 
-            ratingsCount = :ratingsCount, 
-            metacritic = :metacritic, 
-            playtime = :playtime, 
-            updatedAt = :updatedAt 
-        WHERE id = :id
-    """)
-    suspend fun updateGameExceptFeedOrder(
+    @Upsert
+    suspend fun upsertGame(game: GameEntity)
+
+    @Query("SELECT COUNT(*) FROM games")
+    suspend fun count(): Long
+
+    @Upsert
+    suspend fun upsertPlatforms(platforms: List<PlatformEntity>)
+
+    @Upsert
+    suspend fun upsertGenres(genres: List<GenreEntity>)
+
+    @Upsert
+    suspend fun upsertDevelopers(developers: List<DeveloperEntity>)
+
+    @Upsert
+    suspend fun upsertPublishers(publishers: List<PublisherEntity>)
+
+    @Upsert
+    suspend fun upsertPlatformCrossRefs(refs: List<GamePlatformCrossRef>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPlatformCrossRefs(refs: List<GamePlatformCrossRef>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertGenreCrossRefs(refs: List<GameGenreCrossRef>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertDeveloperCrossRefs(refs: List<GameDeveloperCrossRef>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPublisherCrossRefs(refs: List<GamePublisherCrossRef>)
+
+    @Query("DELETE FROM game_platform_cross_ref WHERE gameId IN (:gameIds)")
+    suspend fun deletePlatformRefsFor(gameIds: List<Long>)
+
+    @Query("DELETE FROM game_genre_cross_ref WHERE gameId IN (:gameIds)")
+    suspend fun deleteGenreRefsFor(gameIds: List<Long>)
+
+    @Query("DELETE FROM games")
+    suspend fun clearAllGames()
+
+    @Query("DELETE FROM platforms")
+    suspend fun clearPlatforms()
+
+    @Query("DELETE FROM genres")
+    suspend fun clearGenres()
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertGameIgnore(game: GameEntity): Long
+
+    @Query(
+        """
+    UPDATE games SET
+        slug = :slug,
+        name = :name,
+        released = :released,
+        backgroundImage = :backgroundImage,
+        rating = :rating,
+        metacritic = :metacritic,
+        playtime = :playtime,
+        updatedAt = :updatedAt
+    WHERE id = :id
+    """
+    )
+    suspend fun updateGameFromDetails(
         id: Long,
         slug: String,
         name: String,
         released: String?,
         backgroundImage: String?,
         rating: Double,
-        ratingsCount: Int,
         metacritic: Int?,
         playtime: Int?,
         updatedAt: Long
     )
 
     @Transaction
-    suspend fun upsertGamePreservingFeedOrder(game: GameEntity) {
-        val result = insertGame(game)
-        if (result == -1L) {
-            updateGameExceptFeedOrder(
+    suspend fun upsertGameFromDetails(game: GameEntity) {
+        val rowId = insertGameIgnore(game)
+        if (rowId == -1L) {
+            updateGameFromDetails(
                 id = game.id,
                 slug = game.slug,
                 name = game.name,
                 released = game.released,
                 backgroundImage = game.backgroundImage,
                 rating = game.rating,
-                ratingsCount = game.ratingsCount,
                 metacritic = game.metacritic,
                 playtime = game.playtime,
                 updatedAt = game.updatedAt
             )
         }
     }
-
-    /** Вставляет/обновляет список игр из [games] */
-    @Upsert
-    suspend fun upsertGames(games: List<GameEntity>)
-
-    /** Вставляет/обновляет игру */
-    @Upsert
-    suspend fun upsertGame(game: GameEntity)
-
-    /** Вставляет/обновляет список платформ из [platforms] */
-    @Upsert
-    suspend fun upsertPlatforms(platforms: List<PlatformEntity>)
-
-    /** Вставляет/обновляет список жанров из [genres] */
-    @Upsert
-    suspend fun upsertGenres(genres: List<GenreEntity>)
-
-    /** Вставляет/обновляет список разработчиков из [developers] */
-    @Upsert
-    suspend fun upsertDevelopers(developers: List<DeveloperEntity>)
-
-    /** Вставляет/обновляет список издателей из [publishers] */
-    @Upsert
-    suspend fun upsertPublishers(publishers: List<PublisherEntity>)
-
-    /** Вставляет [refs] в [GamePlatformCrossRef] */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPlatformCrossRefs(refs: List<GamePlatformCrossRef>)
-
-    /** Вставляет [refs] в [GameGenreCrossRef] */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertGenreCrossRefs(refs: List<GameGenreCrossRef>)
-
-    /** Вставляет [refs] в [GameDeveloperCrossRef] */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertDeveloperCrossRefs(refs: List<GameDeveloperCrossRef>)
-
-    /** Вставляет [refs] в [GamePublisherCrossRef] */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPublisherCrossRefs(refs: List<GamePublisherCrossRef>)
-
-    /** Удаляет из [GamePlatformCrossRef] на основе [gameIds] */
-    @Query("DELETE FROM game_platform_cross_ref WHERE gameId IN (:gameIds)")
-    suspend fun deletePlatformRefsFor(gameIds: List<Long>)
-
-    /** Удаляет из [GameGenreCrossRef] на основе [gameIds] */
-    @Query("DELETE FROM game_genre_cross_ref WHERE gameId IN (:gameIds)")
-    suspend fun deleteGenreRefsFor(gameIds: List<Long>)
-
-    /** Очищает таблицу `games` */
-    @Query("DELETE FROM games")
-    suspend fun clearGames()
-
-    /** Очищает таблицу `platforms` */
-    @Query("DELETE FROM platforms")
-    suspend fun clearPlatforms()
-
-    /** Очищает таблицу `genres` */
-    @Query("DELETE FROM genres")
-    suspend fun clearGenres()
-
-    /** Очищает таблицу `game_platform_cross_ref` */
-    @Query("DELETE FROM game_platform_cross_ref")
-    suspend fun clearPlatformCrossRefs()
-
-    /** Очищает таблицу `game_genre_cross_ref` */
-    @Query("DELETE FROM game_genre_cross_ref")
-    suspend fun clearGenreCrossRefs()
-
-    /** @return количество игр в `games` */
-    @Query("SELECT COUNT(*) FROM games")
-    suspend fun count(): Long
-
-    /** @return id игры с максимальным feedOrder или null, если игр нет */
-    @Query("SELECT id FROM games ORDER BY feedOrder DESC LIMIT 1")
-    suspend fun lastFeedGameId(): Long?
 }

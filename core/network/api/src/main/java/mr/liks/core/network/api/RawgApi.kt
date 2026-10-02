@@ -12,13 +12,14 @@ interface RawgApi {
      *
      * @param page номер страницы
      * @param pageSize кол-во результатов на страницу
-     * @param ordering порядок сортировки
+     * @param sortOrder порядок сортировки
      * @return ответ со списком игр [GamesListResponse]
      */
     suspend fun getGames(
         page: Int,
         pageSize: Int = 20,
-        ordering: String = "-added"
+        sortOrder: SortOrder? = null,
+        reverseSortOrder: Boolean = false
     ): GamesListResponse
 
     /**

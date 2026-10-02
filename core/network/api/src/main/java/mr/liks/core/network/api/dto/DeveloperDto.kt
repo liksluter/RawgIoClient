@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
  *
  * @property id id
  * @property name название
- * @property slug
+ * @property slug слаг
  */
 @Serializable
 data class DeveloperDto(

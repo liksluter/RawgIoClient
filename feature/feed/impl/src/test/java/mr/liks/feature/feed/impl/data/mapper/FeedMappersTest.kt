@@ -1,6 +1,7 @@
 package mr.liks.feature.feed.impl.data.mapper
 
 import mr.liks.core.database.entity.GameEntity
+import mr.liks.core.database.entity.GamePlatformCrossRef
 import mr.liks.core.database.entity.PlatformEntity
 import mr.liks.core.database.relation.GameWithPropertiesRelation
 import mr.liks.core.network.api.dto.GameListDto
@@ -8,6 +9,7 @@ import mr.liks.core.network.api.dto.PlatformDto
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import java.time.Instant
 
 class FeedMappersTest {
 
@@ -25,7 +27,7 @@ class FeedMappersTest {
             playtime = 25,
             platforms = emptyList()
         )
-        val entity = dto.toEntity(feedOrder = 7L)
+        val entity = dto.toEntity()
 
         assertEquals(42L, entity.id)
         assertEquals("game-slug", entity.slug)
@@ -35,30 +37,79 @@ class FeedMappersTest {
         assertEquals(4.7, entity.rating, 0.001)
         assertEquals(1500, entity.ratingsCount)
         assertEquals(88, entity.metacritic)
-        assertEquals(7L, entity.feedOrder)
         assertEquals(25, entity.playtime)
     }
 
     @Test
-    fun `PlatformDto toEntity maps all fields`() {
+    fun `GameListDto toFeedEntry uses ordering and negative sort value`() {
+        val dto = GameListDto(
+            id = 42L,
+            slug = "s",
+            name = "n",
+            released = "2023-05-20T10:00:00Z",
+            backgroundImage = null,
+            rating = 4.7,
+            ratingsCount = 0,
+            metacritic = 88,
+            playtime = 0,
+            platforms = emptyList()
+        )
+
+        val byRating = dto.toFeedEntry("-rating")
+        assertEquals("-rating", byRating.ordering)
+        assertEquals(42L, byRating.gameId)
+        assertEquals(-4.7, byRating.sortValue, 0.001)
+        assertEquals(42L, byRating.secondarySort)
+
+        val byMeta = dto.toFeedEntry("-metacritic")
+        assertEquals(-88.0, byMeta.sortValue, 0.001)
+
+        val byReleased = dto.toFeedEntry("-released")
+        assertEquals(-Instant.parse("2023-05-20T10:00:00Z").epochSecond.toDouble(),
+            byReleased.sortValue, 0.001)
+    }
+
+    @Test
+    fun `GameListDto toFeedEntry falls back to rating for unknown ordering`() {
+        val dto = GameListDto(
+            id = 1L, slug = "s", name = "n", released = null,
+            backgroundImage = null, rating = 3.0, ratingsCount = 0,
+            metacritic = null, playtime = 0, platforms = emptyList()
+        )
+        val entry = dto.toFeedEntry("unknown")
+        assertEquals(-3.0, entry.sortValue, 0.001)
+    }
+
+    @Test
+    fun `GameListDto toFeedEntry handles null metacritic and released`() {
+        val dto = GameListDto(
+            id = 1L, slug = "s", name = "n", released = null,
+            backgroundImage = null, rating = 0.0, ratingsCount = 0,
+            metacritic = null, playtime = 0, platforms = emptyList()
+        )
+        assertEquals(0.0, dto.toFeedEntry("-metacritic").sortValue, 0.001)
+        assertEquals(0.0, dto.toFeedEntry("-released").sortValue, 0.001)
+    }
+
+    @Test
+    fun `PlatformDto toEntity maps fields and nulls image`() {
         val dto = PlatformDto(
             id = 10L,
             name = "PlayStation 5",
             slug = "ps5",
-            imageBackground = "https://img.com/ps5.png"
+            image = "https://img.com/ps5.png"
         )
         val entity = dto.toEntity()
 
         assertEquals(10L, entity.id)
         assertEquals("PlayStation 5", entity.name)
         assertEquals("ps5", entity.slug)
-        assertEquals("https://img.com/ps5.png", entity.imageBackground)
+        assertNull(entity.image)
     }
 
     @Test
     fun `platformCrossRef creates correct cross ref`() {
-        val ref = platformCrossRef(gameId = 1L, platformId = 2L, releasedAt = "2023-01-01")
-
+        val ref = GamePlatformCrossRef(gameId = 1L, platformId = 2L, releasedAt = "2023-01-01")
         assertEquals(1L, ref.gameId)
         assertEquals(2L, ref.platformId)
         assertEquals("2023-01-01", ref.releasedAt)
@@ -66,7 +117,7 @@ class FeedMappersTest {
 
     @Test
     fun `platformCrossRef with null releasedAt`() {
-        val ref = platformCrossRef(gameId = 1L, platformId = 2L, releasedAt = null)
+        val ref = GamePlatformCrossRef(gameId = 1L, platformId = 2L, releasedAt = null)
         assertNull(ref.releasedAt)
     }
 
@@ -81,19 +132,20 @@ class FeedMappersTest {
             rating = 4.0,
             ratingsCount = 10,
             metacritic = 70,
-            feedOrder = 3L,
             playtime = 5
         )
         val platformEntity = PlatformEntity(
             id = 1L,
             name = "PC",
             slug = "pc",
-            imageBackground = "icon"
+            image = "icon"
         )
         val relation = GameWithPropertiesRelation(
             game = gameEntity,
             platforms = listOf(platformEntity),
-            genres = emptyList()
+            genres = emptyList(),
+            developers = emptyList(),
+            publishers = emptyList()
         )
 
         val domain = relation.toDomain()
@@ -105,9 +157,24 @@ class FeedMappersTest {
         assertEquals(1, domain.platforms.size)
         assertEquals("PC", domain.platforms[0].name)
         assertEquals("PC", domain.platformsNames)
-        assertEquals(3L, domain.feedOrder)
         assertNull(domain.trailerUrl)
         assertNull(domain.trailerPreview)
+    }
+
+    @Test
+    fun `GameWithPropertiesRelation toDomain with empty platforms gives blank names`() {
+        val relation = GameWithPropertiesRelation(
+            game = GameEntity(
+                id = 1L, slug = "s", name = "n", released = null,
+                backgroundImage = null, rating = 0.0, ratingsCount = 0,
+                metacritic = null, playtime = 0
+            ),
+            platforms = emptyList(),
+            genres = emptyList(),
+            developers = emptyList(),
+            publishers = emptyList()
+        )
+        assertEquals("", relation.toDomain().platformsNames)
     }
 
     @Test
@@ -116,12 +183,12 @@ class FeedMappersTest {
             id = 7L,
             name = "Xbox",
             slug = "xbox",
-            imageBackground = "xbox.png"
+            image = "xbox.png"
         )
         val domain = entity.toDomain()
 
         assertEquals(7L, domain.id)
         assertEquals("Xbox", domain.name)
-        assertEquals("xbox.png", domain.iconUrl)
+        assertEquals("xbox.png", domain.image)
     }
 }

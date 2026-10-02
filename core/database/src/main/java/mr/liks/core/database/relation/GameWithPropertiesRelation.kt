@@ -3,11 +3,15 @@ package mr.liks.core.database.relation
 import androidx.room.Embedded
 import androidx.room.Junction
 import androidx.room.Relation
+import mr.liks.core.database.entity.DeveloperEntity
+import mr.liks.core.database.entity.GameDeveloperCrossRef
 import mr.liks.core.database.entity.GameEntity
 import mr.liks.core.database.entity.GameGenreCrossRef
 import mr.liks.core.database.entity.GamePlatformCrossRef
+import mr.liks.core.database.entity.GamePublisherCrossRef
 import mr.liks.core.database.entity.GenreEntity
 import mr.liks.core.database.entity.PlatformEntity
+import mr.liks.core.database.entity.PublisherEntity
 
 /**
  * Свзяь информация об игре и ее свойства
@@ -39,5 +43,27 @@ data class GameWithPropertiesRelation(
             entityColumn = "genreId"
         )
     )
-    val genres: List<GenreEntity>
+    val genres: List<GenreEntity>,
+
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "id",
+        associateBy = Junction(
+            value = GameDeveloperCrossRef::class,
+            parentColumn = "gameId",
+            entityColumn = "developerId"
+        )
+    )
+    val developers: List<DeveloperEntity>,
+
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "id",
+        associateBy = Junction(
+            value = GamePublisherCrossRef::class,
+            parentColumn = "gameId",
+            entityColumn = "publisherId"
+        )
+    )
+    val publishers: List<PublisherEntity>,
 )

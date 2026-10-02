@@ -20,6 +20,7 @@ class GameDetailsDaoTest : DatabaseTest() {
     @Test
     fun `upsertDetails inserts details`() = runBlocking {
         gameDao.upsertGame(game(1))
+
         val details = GameDetailsEntity(
             gameId = 1,
             description = "desc",
@@ -28,6 +29,7 @@ class GameDetailsDaoTest : DatabaseTest() {
             redditUrl = "reddit",
             metacriticUrl = "meta"
         )
+
         gameDetailsDao.upsertDetails(details)
         val loaded = gameDetailsDao.observeDetails(1).first()
         assertEquals(details, loaded)
@@ -36,8 +38,10 @@ class GameDetailsDaoTest : DatabaseTest() {
     @Test
     fun `observeDetailsWithMedia returns details with trailers and screenshots`() = runBlocking {
         gameDao.upsertGame(game(1))
+
         val details = GameDetailsEntity(1, "desc", "raw", "web", "reddit", "meta")
         gameDetailsDao.upsertDetails(details)
+
         val trailer = TrailerEntity(1, 1, "trailer", "preview", "480", "max")
         val screenshot = ScreenshotEntity(1, 1, "image", 100, 100, false)
         gameDetailsDao.upsertTrailers(listOf(trailer))
@@ -53,9 +57,11 @@ class GameDetailsDaoTest : DatabaseTest() {
     @Test
     fun `observeTrailers returns trailers ordered by id`() = runBlocking {
         gameDao.upsertGame(game(1))
+
         val t1 = TrailerEntity(2, 1, "t2", null, null, null)
         val t2 = TrailerEntity(1, 1, "t1", null, null, null)
         gameDetailsDao.upsertTrailers(listOf(t1, t2))
+
         val trailers = gameDetailsDao.observeTrailers(1).first()
         assertEquals(listOf(t2, t1), trailers)
     }
@@ -63,10 +69,12 @@ class GameDetailsDaoTest : DatabaseTest() {
     @Test
     fun `observeScreenshots returns only non-deleted ordered by id`() = runBlocking {
         gameDao.upsertGame(game(1))
+
         val s1 = ScreenshotEntity(1, 1, "img1", 100, 100, false)
         val s2 = ScreenshotEntity(2, 1, "img2", 100, 100, true)
         val s3 = ScreenshotEntity(3, 1, "img3", 100, 100, false)
         gameDetailsDao.upsertScreenshots(listOf(s1, s2, s3))
+
         val screenshots = gameDetailsDao.observeScreenshots(1).first()
         assertEquals(listOf(s1, s3), screenshots)
     }
@@ -75,7 +83,9 @@ class GameDetailsDaoTest : DatabaseTest() {
     fun `clearTrailers removes trailers for game`() = runBlocking {
         gameDao.upsertGame(game(1))
         gameDetailsDao.upsertTrailers(listOf(TrailerEntity(1, 1, "t", null, null, null)))
+
         gameDetailsDao.clearTrailers(1)
+
         val trailers = gameDetailsDao.observeTrailers(1).first()
         assertTrue(trailers.isEmpty())
     }
@@ -84,7 +94,9 @@ class GameDetailsDaoTest : DatabaseTest() {
     fun `clearScreenshots removes screenshots for game`() = runBlocking {
         gameDao.upsertGame(game(1))
         gameDetailsDao.upsertScreenshots(listOf(ScreenshotEntity(1, 1, "img", 100, 100, false)))
+
         gameDetailsDao.clearScreenshots(1)
+
         val screenshots = gameDetailsDao.observeScreenshots(1).first()
         assertTrue(screenshots.isEmpty())
     }
@@ -93,12 +105,14 @@ class GameDetailsDaoTest : DatabaseTest() {
     fun `clearDetails removes details for game`() = runBlocking {
         gameDao.upsertGame(game(1))
         gameDetailsDao.upsertDetails(GameDetailsEntity(1, "desc", null, null, null, null))
+
         gameDetailsDao.clearDetails(1)
+
         val details = gameDetailsDao.observeDetails(1).first()
         assertNull(details)
     }
 
-    private fun game(id: Long = 1, feedOrder: Long = id) = GameEntity(
+    private fun game(id: Long) = GameEntity(
         id = id,
         slug = "game-$id",
         name = "Game $id",
@@ -107,7 +121,6 @@ class GameDetailsDaoTest : DatabaseTest() {
         rating = 0.0,
         ratingsCount = 0,
         metacritic = null,
-        playtime = null,
-        feedOrder = feedOrder
+        playtime = null
     )
 }

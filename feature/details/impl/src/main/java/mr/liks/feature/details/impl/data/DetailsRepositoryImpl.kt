@@ -53,10 +53,8 @@ class DetailsRepositoryImpl(
                 website = details.website,
                 redditUrl = details.redditUrl,
                 metacriticUrl = details.metacriticUrl,
-                developers = relations?.let { r ->
-                    emptyList()
-                } ?: emptyList(),
-                publishers = emptyList(),
+                developers = relations?.developers?.map { it.toDomain() } ?: emptyList(),
+                publishers = relations?.publishers?.map { it.toDomain() } ?: emptyList(),
                 genres = relations?.genres?.map { it.toDomain() } ?: emptyList(),
                 platforms = relations?.platforms?.map { it.toDomain() } ?: emptyList()
             )
@@ -83,7 +81,7 @@ class DetailsRepositoryImpl(
                 val dto = api.getGameDetails(gameId = gameId)
 
                 database.withTransaction {
-                    database.gameDao().upsertGamePreservingFeedOrder(
+                    database.gameDao().upsertGameFromDetails(
                         GameEntity(
                             id = dto.id,
                             slug = dto.slug,
@@ -93,8 +91,7 @@ class DetailsRepositoryImpl(
                             rating = dto.rating,
                             ratingsCount = 0,
                             metacritic = dto.metacritic,
-                            playtime = dto.playtime,
-                            feedOrder = -1
+                            playtime = dto.playtime
                         )
                     )
 

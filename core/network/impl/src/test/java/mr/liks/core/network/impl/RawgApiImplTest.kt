@@ -10,6 +10,7 @@ import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
+import mr.liks.core.network.api.SortOrder
 import mr.liks.core.network.api.dto.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -32,7 +33,18 @@ class RawgApiImplTest {
             previous = null,
             next = "next",
             results = listOf(
-                GameListDto(1, "slug", "Name", "2023-01-01", "img", 4.5, 100, 90, 10, emptyList())
+                GameListDto(
+                    1,
+                    "slug",
+                    "Name",
+                    "2023-01-01",
+                    backgroundImage = "img",
+                    rating = 4.5,
+                    ratingsCount = 100,
+                    metacritic = 90,
+                    playtime = 10,
+                    platforms = emptyList<PlatformWrapperDto>()
+                )
             )
         )
         val responseJson = json.encodeToString(GamesListResponse.serializer(), expected)
@@ -41,7 +53,7 @@ class RawgApiImplTest {
             assertEquals("/games", request.url.encodedPath)
             assertEquals("1", request.url.parameters["page"])
             assertEquals("20", request.url.parameters["page_size"])
-            assertEquals("-added", request.url.parameters["ordering"])
+            assertEquals("-rating", request.url.parameters["ordering"])
             respond(
                 responseJson,
                 HttpStatusCode.OK,
@@ -50,7 +62,7 @@ class RawgApiImplTest {
         }
 
         val api = RawgApiImpl(createClient(engine))
-        val result = api.getGames(page = 1, pageSize = 20, ordering = "-added")
+        val result = api.getGames(page = 1, pageSize = 20, sortOrder = SortOrder.RATING, reverseSortOrder = true)
         assertEquals(expected, result)
     }
 

@@ -43,9 +43,10 @@ class FeedScreenshotTest {
             PlatformIcon(3L, "Xbox Series X", "xbox.png")
         ),
         platformsNames = "PC, PlayStation 5, Xbox Series X",
-        feedOrder = 0L,
         trailerUrl = null,
-        trailerPreview = null
+        trailerPreview = null,
+        released = null,
+        genres = null
     )
 
     private val secondGame = GamePreview(
@@ -55,9 +56,10 @@ class FeedScreenshotTest {
         rating = 4.2,
         platforms = listOf(PlatformIcon(1L, "PC", "pc.png")),
         platformsNames = "PC",
-        feedOrder = 1L,
         trailerUrl = null,
-        trailerPreview = null
+        trailerPreview = null,
+        released = null,
+        genres = null
     )
 
     private val gameWithoutPlatforms = sampleGame.copy(

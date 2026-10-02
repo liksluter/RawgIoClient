@@ -11,5 +11,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PlatformWrapperDto(
     val platform: PlatformDto,
-    val releasedAt: String? = null
+    val releasedAt: String? = null,
+    val requirementsEn: RequirementsDto? = null,
+    val requirementsRu: RequirementsDto? = null,
 )

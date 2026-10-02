@@ -5,6 +5,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import mr.liks.core.network.api.RawgApi
+import mr.liks.core.network.api.SortOrder
 import mr.liks.core.network.api.dto.GameDetailsDto
 import mr.liks.core.network.api.dto.GamesListResponse
 import mr.liks.core.network.api.dto.MoviesResponse
@@ -17,11 +18,12 @@ class RawgApiImpl(
     override suspend fun getGames(
         page: Int,
         pageSize: Int,
-        ordering: String
+        sortOrder: SortOrder?,
+        reverseSortOrder: Boolean
     ): GamesListResponse = client.get("games") {
         parameter("page", page)
         parameter("page_size", pageSize)
-        parameter("ordering", ordering)
+        sortOrder?.let { parameter("ordering", it.getOrdering(reverseSortOrder)) }
     }.body()
 
     override suspend fun searchGames(

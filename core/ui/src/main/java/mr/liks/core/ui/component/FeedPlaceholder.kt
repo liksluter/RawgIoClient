@@ -1,6 +1,5 @@
 package mr.liks.core.ui.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import mr.liks.core.designsystem.theme.CardShape
 import mr.liks.core.designsystem.theme.MediaShape
 import mr.liks.core.designsystem.theme.RawgTheme
+import mr.liks.core.ui.effect.FeedShimmer
+import mr.liks.core.ui.effect.shimmer
 
 /**
  * Плейсхолдер ленты на время первой загрузки
@@ -40,23 +40,25 @@ fun FeedPlaceholder(
     topPadding: Dp,
     itemCount: Int = DEFAULT_ITEM_COUNT
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
-            top = topPadding + RawgTheme.spacing.feedCardVertical,
-            bottom = RawgTheme.spacing.huge
-        ),
-        verticalArrangement = Arrangement.spacedBy(RawgTheme.spacing.feedCardVertical),
-        userScrollEnabled = false
-    ) {
-        items(count = itemCount, key = { it }) {
-            FeedPlaceholderCard()
+    FeedShimmer {
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            contentPadding = PaddingValues(
+                top = topPadding + RawgTheme.spacing.feedCardVertical,
+                bottom = RawgTheme.spacing.huge
+            ),
+            verticalArrangement = Arrangement.spacedBy(RawgTheme.spacing.feedCardVertical),
+            userScrollEnabled = false
+        ) {
+            items(count = itemCount, key = { it }) {
+                FeedPlaceholderCard()
+            }
         }
     }
 }
 
 @Composable
-private fun FeedPlaceholderCard(modifier: Modifier = Modifier) {
+fun FeedPlaceholderCard(modifier: Modifier = Modifier) {
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -70,7 +72,7 @@ private fun FeedPlaceholderCard(modifier: Modifier = Modifier) {
                     .fillMaxWidth()
                     .aspectRatio(16f / 9f)
                     .clip(MediaShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .shimmer()
             )
 
             Spacer(Modifier.height(RawgTheme.spacing.small))
@@ -87,7 +89,7 @@ private fun FeedPlaceholderCard(modifier: Modifier = Modifier) {
                             modifier = Modifier
                                 .size(24.dp)
                                 .clip(RoundedCornerShape(4.dp))
-                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                .shimmer()
                         )
                     }
                 }
@@ -95,7 +97,7 @@ private fun FeedPlaceholderCard(modifier: Modifier = Modifier) {
                     modifier = Modifier
                         .size(width = 32.dp, height = 20.dp)
                         .clip(RoundedCornerShape(6.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .shimmer()
                 )
             }
 
@@ -107,7 +109,7 @@ private fun FeedPlaceholderCard(modifier: Modifier = Modifier) {
                     .fillMaxWidth(0.6f)
                     .height(18.dp)
                     .clip(RoundedCornerShape(4.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .shimmer()
             )
 
             Spacer(Modifier.height(RawgTheme.spacing.small))

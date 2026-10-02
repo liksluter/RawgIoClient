@@ -33,9 +33,10 @@ class FeedContentTest {
         rating = 4.0,
         platforms = emptyList(),
         platformsNames = "PC",
-        feedOrder = 0L,
         trailerUrl = null,
-        trailerPreview = null
+        trailerPreview = null,
+        released = null,
+        genres = null
     )
 
     @Test

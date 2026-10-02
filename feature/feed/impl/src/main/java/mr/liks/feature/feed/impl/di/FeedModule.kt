@@ -15,7 +15,7 @@ val FeedModule = module {
         FeedRepositoryImpl(
             api = get(),
             database = get(),
-            dispatchers = get()
+            dispatchers = get(),
         )
     }
 

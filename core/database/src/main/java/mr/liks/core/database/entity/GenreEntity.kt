@@ -14,5 +14,6 @@ import androidx.room.PrimaryKey
 data class GenreEntity(
     @PrimaryKey val id: Long,
     val name: String,
-    val slug: String
+    val slug: String,
+    val gamesCount: Int? = null,
 )

@@ -11,6 +11,12 @@ android {
     defaultConfig {
         applicationId = "mr.liks.rawgioclient"
     }
+
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -49,4 +55,6 @@ dependencies {
 
     implementation(libs.haze)
     implementation(libs.haze.materials)
+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }

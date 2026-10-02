@@ -7,6 +7,7 @@ import mr.liks.core.database.dao.GameDetailsDao
 import mr.liks.core.database.dao.RemoteKeyDao
 import mr.liks.core.database.dao.SearchHistoryDao
 import mr.liks.core.database.entity.DeveloperEntity
+import mr.liks.core.database.entity.FeedEntryEntity
 import mr.liks.core.database.entity.GameDetailsEntity
 import mr.liks.core.database.entity.GameDeveloperCrossRef
 import mr.liks.core.database.entity.GameEntity
@@ -18,6 +19,7 @@ import mr.liks.core.database.entity.PlatformEntity
 import mr.liks.core.database.entity.PublisherEntity
 import mr.liks.core.database.entity.RemoteKeyEntity
 import mr.liks.core.database.entity.ScreenshotEntity
+import mr.liks.core.database.entity.SearchEntryEntity
 import mr.liks.core.database.entity.SearchHistoryEntity
 import mr.liks.core.database.entity.TrailerEntity
 
@@ -25,6 +27,8 @@ import mr.liks.core.database.entity.TrailerEntity
 @Database(
     entities = [
         GameEntity::class,
+        FeedEntryEntity::class,
+        SearchEntryEntity::class,
         PlatformEntity::class,
         GamePlatformCrossRef::class,
         GenreEntity::class,

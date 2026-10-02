@@ -75,6 +75,7 @@ class DetailsRepositoryImplTest {
             every { id } returns 3L
             every { name } returns "RPG"
             every { slug } returns "rpg"
+            every { gamesCount } returns null
         }
 
         val dto = mockk<GameDetailsDto>(relaxed = true) {
@@ -101,7 +102,6 @@ class DetailsRepositoryImplTest {
 
         repository.refreshDetails(1L)
 
-        coVerify { gameDao.upsertGamePreservingFeedOrder(any()) }
         coVerify { gameDetailsDao.upsertDetails(any()) }
         coVerify { gameDao.upsertDevelopers(any()) }
         coVerify { gameDao.insertDeveloperCrossRefs(any()) }
@@ -220,7 +220,6 @@ class DetailsRepositoryImplTest {
             ratingsCount = 0,
             metacritic = 90,
             playtime = 10,
-            feedOrder = 0
         )
         val details = GameDetailsEntity(
             gameId = 1L,

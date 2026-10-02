@@ -26,7 +26,9 @@ import mr.liks.core.ui.component.ErrorFooter
 import mr.liks.core.ui.component.FeedEmpty
 import mr.liks.core.ui.component.FeedError
 import mr.liks.core.ui.component.FeedPlaceholder
+import mr.liks.core.ui.component.FeedPlaceholderCard
 import mr.liks.core.ui.component.LoadingFooter
+import mr.liks.core.ui.effect.FeedShimmer
 import mr.liks.feature.feed.impl.presentation.component.GameFeedCard
 
 @Composable
@@ -41,7 +43,6 @@ internal fun FeedContent(
     onGameClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
-
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -86,14 +87,19 @@ internal fun FeedContent(
                     ) {
                         items(
                             count = games.itemCount,
-                            key = games.itemKey { it.id }
+                            key = games.itemKey { it.id },
+                            contentType = { "game" }
                         ) { index ->
-                            val game = games[index] ?: return@items
-                            GameFeedCard(
-                                game = game,
-                                isVisible = index == firstVisibleIndex,
-                                onClick = { onGameClick(game.id) }
-                            )
+                            val game = games[index]
+                            if (game != null) {
+                                GameFeedCard(
+                                    game = game,
+                                    isVisible = index == firstVisibleIndex,
+                                    onClick = { onGameClick(game.id) }
+                                )
+                            } else {
+                                FeedShimmer { FeedPlaceholderCard() }
+                            }
                         }
 
                         when (val append = games.loadState.append) {

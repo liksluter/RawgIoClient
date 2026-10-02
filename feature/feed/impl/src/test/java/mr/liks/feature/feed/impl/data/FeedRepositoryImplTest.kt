@@ -53,19 +53,17 @@ class FeedRepositoryImplTest {
     }
 
     @Test
-    fun `refresh clears all tables in transaction`() = runTest {
+    fun `refresh clears feed entries and remote key for current ordering`() = runTest {
         repository.refresh()
 
-        coVerify { remoteKeyDao.clearAll() }
-        coVerify { gameDao.clearPlatformCrossRefs() }
-        coVerify { gameDao.clearGames() }
-        coVerify { gameDao.clearPlatforms() }
+        coVerify { remoteKeyDao.clearForOrdering(any()) }
+        coVerify { gameDao.clearFeedEntries(any()) }
     }
 
     @Test
     fun `getPagingData returns flow`() = runTest {
         val pagingSource = mockk<PagingSource<Int, GameWithPropertiesRelation>>()
-        every { gameDao.pagingSource() } returns pagingSource
+        every { gameDao.feedPagingSource(any()) } returns pagingSource
 
         val flow = repository.getPagingData()
         assert(flow != null)

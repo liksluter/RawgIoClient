@@ -23,6 +23,11 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -55,4 +60,6 @@ dependencies {
     testImplementation(libs.roborazzi)
     testImplementation(libs.roborazzi.compose)
     testImplementation(libs.roborazzi.junit.rule)
+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
