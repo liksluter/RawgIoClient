@@ -47,7 +47,7 @@ class GameFeedCardTest {
         composeRule.setContent {
             GameFeedCard(game = fakeGame, isVisible = true, onClick = {})
         }
-        composeRule.onNodeWithText("PC").assertIsDisplayed()
+        composeRule.onNodeWithText("Платформы: PC").assertIsDisplayed()
     }
 
     @Test

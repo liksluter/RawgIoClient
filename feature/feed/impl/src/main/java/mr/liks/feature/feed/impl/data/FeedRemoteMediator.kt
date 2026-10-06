@@ -6,6 +6,7 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import mr.liks.core.database.RawgDatabase
+import mr.liks.core.database.entity.GameGenreCrossRef
 import mr.liks.core.database.entity.GamePlatformCrossRef
 import mr.liks.core.database.entity.RemoteKeyEntity
 import mr.liks.core.database.relation.GameWithPropertiesRelation
@@ -93,6 +94,23 @@ class FeedRemoteMediator(
                 }
                 if (refs.isNotEmpty()) {
                     database.gameDao().upsertPlatformCrossRefs(refs)
+                }
+
+                val genres = response.results
+                    .flatMap { it.genres }
+                    .map { it.toEntity() }
+                    .distinctBy { it.id }
+                if (genres.isNotEmpty()) {
+                    database.gameDao().upsertGenres(genres)
+                }
+
+                val genreCrossRefs = response.results.flatMap { game ->
+                    game.genres.map { genre ->
+                        GameGenreCrossRef(game.id, genre.id)
+                    }
+                }
+                if (genreCrossRefs.isNotEmpty()) {
+                    database.gameDao().upsertGenreCrossRefs(genreCrossRefs)
                 }
 
                 database.remoteKeyDao().insertKey(

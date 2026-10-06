@@ -5,6 +5,7 @@ import mr.liks.core.database.entity.GamePlatformCrossRef
 import mr.liks.core.database.entity.PlatformEntity
 import mr.liks.core.database.relation.GameWithPropertiesRelation
 import mr.liks.core.network.api.dto.GameListDto
+import mr.liks.core.network.api.dto.GenreDto
 import mr.liks.core.network.api.dto.PlatformDto
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -119,6 +120,21 @@ class FeedMappersTest {
     fun `platformCrossRef with null releasedAt`() {
         val ref = GamePlatformCrossRef(gameId = 1L, platformId = 2L, releasedAt = null)
         assertNull(ref.releasedAt)
+    }
+
+    @Test
+    fun `GenreDto toEntity maps fields and nulls image`() {
+        val dto = GenreDto(
+            id = 10L,
+            name = "RPG",
+            slug = "rpg",
+            gamesCount = null
+        )
+        val entity = dto.toEntity()
+
+        assertEquals(10L, entity.id)
+        assertEquals("RPG", entity.name)
+        assertEquals("rpg", entity.slug)
     }
 
     @Test

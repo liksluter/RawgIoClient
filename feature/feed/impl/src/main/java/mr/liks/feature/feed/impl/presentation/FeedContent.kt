@@ -72,45 +72,47 @@ internal fun FeedContent(
                 if (games.itemCount == 0) {
                     FeedEmpty(modifier = Modifier.fillMaxSize())
                 } else {
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(
-                            top = contentPadding.calculateTopPadding() +
-                                    RawgTheme.spacing.feedCardVertical,
-                            bottom = contentPadding.calculateBottomPadding() +
-                                    RawgTheme.spacing.huge
-                        ),
-                        verticalArrangement = Arrangement.spacedBy(
-                            RawgTheme.spacing.feedCardVertical
-                        )
-                    ) {
-                        items(
-                            count = games.itemCount,
-                            key = games.itemKey { it.id },
-                            contentType = { "game" }
-                        ) { index ->
-                            val game = games[index]
-                            if (game != null) {
-                                GameFeedCard(
-                                    game = game,
-                                    isVisible = index == firstVisibleIndex,
-                                    onClick = { onGameClick(game.id) }
-                                )
-                            } else {
-                                FeedShimmer { FeedPlaceholderCard() }
+                    FeedShimmer {
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(
+                                top = contentPadding.calculateTopPadding() +
+                                        RawgTheme.spacing.feedCardVertical,
+                                bottom = contentPadding.calculateBottomPadding() +
+                                        RawgTheme.spacing.huge
+                            ),
+                            verticalArrangement = Arrangement.spacedBy(
+                                RawgTheme.spacing.feedCardVertical
+                            )
+                        ) {
+                            items(
+                                count = games.itemCount,
+                                key = games.itemKey { it.id },
+                                contentType = { "game" }
+                            ) { index ->
+                                val game = games[index]
+                                if (game != null) {
+                                    GameFeedCard(
+                                        game = game,
+                                        isVisible = index == firstVisibleIndex,
+                                        onClick = { onGameClick(game.id) }
+                                    )
+                                } else {
+                                    FeedPlaceholderCard()
+                                }
                             }
-                        }
 
-                        when (val append = games.loadState.append) {
-                            is LoadState.Loading -> item { LoadingFooter() }
-                            is LoadState.Error -> item {
-                                ErrorFooter(
-                                    onRetry = { games.retry() },
-                                    message = append.error.message
-                                )
+                            when (val append = games.loadState.append) {
+                                is LoadState.Loading -> item { LoadingFooter() }
+                                is LoadState.Error -> item {
+                                    ErrorFooter(
+                                        onRetry = { games.retry() },
+                                        message = append.error.message
+                                    )
+                                }
+                                else -> Unit
                             }
-                            else -> Unit
                         }
                     }
                 }
