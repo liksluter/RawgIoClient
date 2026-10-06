@@ -21,6 +21,7 @@ import mr.liks.core.network.api.RawgApi
 import mr.liks.core.network.api.SortOrder
 import mr.liks.core.network.api.dto.GameListDto
 import mr.liks.core.network.api.dto.GamesListResponse
+import mr.liks.core.network.api.dto.GenreDto
 import mr.liks.core.network.api.dto.PlatformDto
 import mr.liks.core.network.api.dto.PlatformWrapperDto
 import org.junit.After
@@ -123,6 +124,8 @@ class FeedRemoteMediatorTest {
         coVerify { gameDao.upsertFeedEntries(any()) }
         coVerify { gameDao.upsertPlatforms(any()) }
         coVerify { gameDao.upsertPlatformCrossRefs(any()) }
+        coVerify { gameDao.upsertGenres(any()) }
+        coVerify { gameDao.upsertGenreCrossRefs(any()) }
         coVerify { remoteKeyDao.insertKey(any()) }
     }
 
@@ -232,6 +235,14 @@ class FeedRemoteMediatorTest {
             PlatformWrapperDto(
                 platform = PlatformDto(1L, "PC", "pc", "icon"),
                 releasedAt = "2023-01-01"
+            )
+        ),
+        genres = listOf(
+            GenreDto(
+                id = 1L,
+                name = "RPG",
+                slug = "rpg",
+                gamesCount = null
             )
         )
     )

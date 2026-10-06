@@ -2,12 +2,13 @@ package mr.liks.feature.feed.impl.data.mapper
 
 import mr.liks.core.database.entity.FeedEntryEntity
 import mr.liks.core.database.entity.GameEntity
-import mr.liks.core.database.entity.GamePlatformCrossRef
+import mr.liks.core.database.entity.GenreEntity
 import mr.liks.core.database.entity.PlatformEntity
 import mr.liks.core.database.relation.GameWithPropertiesRelation
 import mr.liks.core.model.GamePreview
 import mr.liks.core.model.PlatformIcon
 import mr.liks.core.network.api.dto.GameListDto
+import mr.liks.core.network.api.dto.GenreDto
 import mr.liks.core.network.api.dto.PlatformDto
 import java.time.Instant
 
@@ -46,6 +47,14 @@ fun PlatformDto.toEntity(): PlatformEntity = PlatformEntity(
     name = name,
     slug = slug,
     image = null
+)
+
+/** Маппер [GenreDto] -> [GenreEntity] */
+fun GenreDto.toEntity(): GenreEntity = GenreEntity(
+    id = id,
+    name = name,
+    slug = slug,
+    gamesCount = gamesCount
 )
 
 /** Маппер [GameWithPropertiesRelation] -> [GamePreview] */

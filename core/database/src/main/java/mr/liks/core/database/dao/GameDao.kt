@@ -93,6 +93,9 @@ interface GameDao {
     @Upsert
     suspend fun upsertPlatformCrossRefs(refs: List<GamePlatformCrossRef>)
 
+    @Upsert
+    suspend fun upsertGenreCrossRefs(refs: List<GameGenreCrossRef>)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlatformCrossRefs(refs: List<GamePlatformCrossRef>)
 

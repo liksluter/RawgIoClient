@@ -32,7 +32,7 @@ class FeedRepositoryImpl(
     private val api: RawgApi,
     private val database: RawgDatabase,
     private val dispatchers: DispatchersProvider,
-    private val sortOrder: SortOrder = SortOrder.RATING,
+    private val sortOrder: SortOrder = SortOrder.ADDED,
     private val reverseSortOrder: Boolean = true
 ) : FeedRepository {
     private val ordering = sortOrder.getOrdering(reverseSortOrder)
@@ -56,7 +56,9 @@ class FeedRepositoryImpl(
         )
             .flow
             .map { pagingData ->
-                pagingData.map { gameWithRelations -> gameWithRelations.toDomain() }
+                pagingData.map { gameWithRelations ->
+                    gameWithRelations.toDomain()
+                }
             }
             .flowOn(dispatchers.io)
     }
