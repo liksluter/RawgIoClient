@@ -27,11 +27,24 @@ class DetailsHeaderTest {
             }
         }
 
-        composeTestRule.onNodeWithText("The Witcher 3").assertIsDisplayed()
+        // Название склеено с бейджем рейтинга через inline content — ищем подстроку
+        composeTestRule.onNodeWithText("The Witcher 3", substring = true).assertIsDisplayed()
         composeTestRule.onNodeWithText("Разработчик:").assertIsDisplayed()
         composeTestRule.onNodeWithText("CD Projekt Red").assertIsDisplayed()
         composeTestRule.onNodeWithText("Издатель:").assertIsDisplayed()
         composeTestRule.onNodeWithText("CD Projekt").assertIsDisplayed()
+    }
+
+    @Test
+    fun header_displaysReleaseDate() {
+        composeTestRule.setContent {
+            RawgTheme {
+                DetailsHeader(details = sampleDetails())
+            }
+        }
+
+        composeTestRule.onNodeWithText("Дата релиза:").assertIsDisplayed()
+        composeTestRule.onNodeWithText("2015-05-19").assertIsDisplayed()
     }
 
     private fun sampleDetails(): GameDetails = mockk(relaxed = true) {

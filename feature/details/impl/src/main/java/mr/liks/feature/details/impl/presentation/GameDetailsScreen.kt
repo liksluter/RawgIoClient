@@ -14,15 +14,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.fromHtml
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mr.liks.core.designsystem.theme.RawgTheme
 import mr.liks.core.ui.component.FeedError
-import mr.liks.core.ui.component.FeedPlaceholder
 import mr.liks.feature.details.impl.presentation.component.DetailsHeader
+import mr.liks.feature.details.impl.presentation.component.GameDetailsPlaceholder
 import mr.liks.feature.details.impl.presentation.component.MediaPager
 import mr.liks.feature.details.impl.presentation.component.MediaViewerDialog
 import org.koin.androidx.compose.koinViewModel
@@ -52,7 +52,10 @@ fun GameDetailsScreen(
 
     when {
         uiState.isInitialLoading -> {
-            FeedPlaceholder(modifier = Modifier.fillMaxSize(), topPadding = 0.dp)
+            GameDetailsPlaceholder(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = contentPadding
+            )
         }
 
         uiState.details == null -> {
@@ -110,21 +113,26 @@ private fun DetailsContent(
             }
         }
 
-        val description = details.descriptionRaw ?: details.description
-        if (!description.isNullOrBlank()) {
+        if (!details.description.isNullOrBlank()) {
             item("description") {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = RawgTheme.spacing.large)
                 ) {
+                    val annotatedDescription = remember(details.description) {
+                        val spanned = HtmlCompat.fromHtml(details.description ?: "",
+                            HtmlCompat.FROM_HTML_MODE_LEGACY)
+                        buildAnnotatedString { append(spanned.toString()) }
+                    }
+
                     Text(
                         text = "Об игре",
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(Modifier.height(RawgTheme.spacing.small))
                     Text(
-                        text = AnnotatedString.fromHtml(htmlString = description),
+                        text = annotatedDescription,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

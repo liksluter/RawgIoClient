@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,10 +39,17 @@ fun MediaPager(
 
     val items = media.all
 
+    val rowHeight = remember(items) {
+        items.maxOf { it.previewHeightDp(PreviewWidthPx) }.dp
+    }
+
     LazyRow(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(rowHeight),
         contentPadding = PaddingValues(horizontal = RawgTheme.spacing.large),
-        horizontalArrangement = Arrangement.spacedBy(RawgTheme.spacing.small)
+        horizontalArrangement = Arrangement.spacedBy(RawgTheme.spacing.small),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         itemsIndexed(
             items = items,
@@ -65,10 +74,8 @@ private fun MediaPreview(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val aspectRatio = when (item) {
-        is MediaItem.Trailer -> 16f / 9f
-        is MediaItem.Screenshot -> item.value.aspectRatio
-    }
+    val aspectRatio = item.previewAspectRatio()
+    val height = (PreviewWidthPx / aspectRatio).dp
 
     val imageUrl = when (item) {
         is MediaItem.Trailer -> item.value.preview
@@ -77,7 +84,7 @@ private fun MediaPreview(
 
     Box(
         modifier = modifier
-            .size(width = 220.dp, height = (220 / aspectRatio).dp)
+            .size(width = PreviewWidth, height = height)
             .clip(MediaShape)
             .background(Color.Black)
             .clickable(onClick = onClick)
@@ -107,3 +114,14 @@ private fun MediaPreview(
         }
     }
 }
+
+private const val PreviewWidthPx = 220f
+private val PreviewWidth = 220.dp
+
+private fun MediaItem.previewAspectRatio(): Float = when (this) {
+    is MediaItem.Trailer -> 16f / 9f
+    is MediaItem.Screenshot -> value.aspectRatio
+}
+
+private fun MediaItem.previewHeightDp(widthPx: Float): Float =
+    widthPx / previewAspectRatio()
