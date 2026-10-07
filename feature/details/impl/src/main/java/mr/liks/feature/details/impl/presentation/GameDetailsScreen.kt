@@ -79,6 +79,7 @@ fun GameDetailsScreen(
                 MediaViewerDialog(
                     media = uiState.media,
                     initialIndex = index,
+                    playerController = viewModel.trailerPlayerController,
                     onDismiss = { viewModel.onIntent(GameDetailsIntent.CloseMedia) }
                 )
             }

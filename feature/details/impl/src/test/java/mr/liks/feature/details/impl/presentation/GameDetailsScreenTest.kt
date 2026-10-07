@@ -10,6 +10,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import mr.liks.core.designsystem.theme.RawgTheme
+import mr.liks.core.media.TrailerPlayerController
 import mr.liks.core.model.GameDetails
 import org.junit.Rule
 import org.junit.Test
@@ -89,5 +90,6 @@ class GameDetailsScreenTest {
         mockk(relaxed = true) {
             every { uiState } returns MutableStateFlow(state)
             every { effects } returns emptyFlow()
+            every { trailerPlayerController } returns mockk<TrailerPlayerController>(relaxed = true)
         }
 }

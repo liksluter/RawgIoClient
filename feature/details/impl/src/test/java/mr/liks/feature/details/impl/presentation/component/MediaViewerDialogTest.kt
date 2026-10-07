@@ -4,11 +4,15 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import io.mockk.mockk
+import io.mockk.verify
+import mr.liks.core.media.TrailerPlayerController
 import mr.liks.core.model.GameMedia
 import mr.liks.core.model.Screenshot
 import mr.liks.core.model.Trailer
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,6 +22,13 @@ class MediaViewerDialogTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+
+    private lateinit var playerController: TrailerPlayerController
+
+    @Before
+    fun setUp() {
+        playerController = mockk(relaxed = true)
+    }
 
     @Test
     fun viewerDialog_closeButtonDismisses() {
@@ -29,6 +40,7 @@ class MediaViewerDialogTest {
             MediaViewerDialog(
                 media = media,
                 initialIndex = 0,
+                playerController = playerController,
                 onDismiss = { dismissed = true }
             )
         }
@@ -48,6 +60,7 @@ class MediaViewerDialogTest {
             MediaViewerDialog(
                 media = media,
                 initialIndex = 0,
+                playerController = playerController,
                 onDismiss = { dismissed = true }
             )
         }
@@ -69,6 +82,7 @@ class MediaViewerDialogTest {
             MediaViewerDialog(
                 media = media,
                 initialIndex = 99,
+                playerController = playerController,
                 onDismiss = { dismissed = true }
             )
         }
@@ -89,6 +103,7 @@ class MediaViewerDialogTest {
             MediaViewerDialog(
                 media = media,
                 initialIndex = -5,
+                playerController = playerController,
                 onDismiss = { dismissed = true }
             )
         }
@@ -118,6 +133,7 @@ class MediaViewerDialogTest {
             MediaViewerDialog(
                 media = media,
                 initialIndex = 0,
+                playerController = playerController,
                 onDismiss = { dismissed = true }
             )
         }
@@ -125,6 +141,24 @@ class MediaViewerDialogTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithContentDescription("Закрыть").assertExists()
+    }
+
+    @Test
+    fun viewerDialog_screenshotOnStartPausesPlayer() {
+        val media = mediaWithScreenshot()
+
+        composeTestRule.setContent {
+            MediaViewerDialog(
+                media = media,
+                initialIndex = 0,
+                playerController = playerController,
+                onDismiss = {}
+            )
+        }
+
+        composeTestRule.waitForIdle()
+
+        verify { playerController.pause() }
     }
 
     private fun mediaWithScreenshot() = GameMedia(
