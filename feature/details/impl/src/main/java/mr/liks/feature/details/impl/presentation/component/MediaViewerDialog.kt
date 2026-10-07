@@ -1,11 +1,18 @@
 package mr.liks.feature.details.impl.presentation.component
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -14,14 +21,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil3.compose.AsyncImage
+import kotlinx.coroutines.launch
 import mr.liks.core.media.TrailerPlayer
 import mr.liks.core.model.GameMedia
 import mr.liks.core.model.MediaItem
@@ -71,9 +83,8 @@ fun MediaViewerDialog(
                 onClick = onDismiss,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(16.dp)
+                    .windowInsetsPadding(WindowInsets.safeDrawing)
                     .size(40.dp)
-                    .background(Color(0x66000000), shape = androidx.compose.foundation.shape.CircleShape)
             ) {
                 Icon(
                     imageVector = Icons.Filled.Close,
@@ -108,6 +119,22 @@ private fun ScreenshotPage(item: MediaItem.Screenshot) {
 
 @Composable
 private fun ScreenshotPage(image: String?) {
+    val scale = remember { Animatable(1f) }
+    val offset = remember { Animatable(Offset.Zero, Offset.VectorConverter) }
+    val coroutineScope = rememberCoroutineScope()
+
+    val state = rememberTransformableState { zoomChange, offsetChange, _ ->
+        coroutineScope.launch {
+            val newScale = (scale.value * zoomChange).coerceIn(0.7f, 5f)
+            scale.snapTo(newScale)
+
+            if (newScale > 1f) {
+                val newOffset = offset.value + offsetChange
+                offset.snapTo(newOffset)
+            }
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -117,8 +144,32 @@ private fun ScreenshotPage(image: String?) {
         AsyncImage(
             model = image,
             contentDescription = null,
-            modifier = Modifier.fillMaxWidth(),
-            contentScale = ContentScale.Fit
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .fillMaxWidth()
+                .graphicsLayer(
+                    scaleX = scale.value,
+                    scaleY = scale.value,
+                    translationX = offset.value.x,
+                    translationY = offset.value.y
+                )
+                .transformable(
+                    state = state,
+                    canPan = { scale.value > 1f }
+                )
+                .pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            if (event.changes.all { !it.pressed }) {
+                                coroutineScope.launch {
+                                    launch { scale.animateTo(1f) }
+                                    launch { offset.animateTo(Offset.Zero) }
+                                }
+                            }
+                        }
+                    }
+                }
         )
     }
 }
