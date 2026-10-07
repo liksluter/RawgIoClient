@@ -1,14 +1,19 @@
 package mr.liks.rawgioclient.presentation
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import dev.chrisbanes.haze.HazeState
+import mr.liks.core.designsystem.theme.RawgTheme
 import mr.liks.core.navigation.AppNavigator
 import mr.liks.core.navigation.TopLevelRoute
 import mr.liks.feature.details.impl.presentation.GameDetailsScreen
@@ -27,6 +32,21 @@ fun MainNavHost(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
+    val localSpacing = RawgTheme.spacing
+    val systemNavBarPadding = WindowInsets.navigationBars.asPaddingValues()
+    val contentPaddingWithTopBar = remember(contentPadding) {
+        PaddingValues(
+            top = contentPadding.calculateTopPadding() + TopBarExpandedHeight,
+            bottom = contentPadding.calculateBottomPadding(),
+        )
+    }
+    val contentPaddingFoGameDetails = remember(contentPadding) {
+        PaddingValues(
+            top = contentPadding.calculateTopPadding(),
+            bottom = systemNavBarPadding.calculateBottomPadding() + localSpacing.feedCardVertical,
+        )
+    }
+
     NavDisplay(
         backStack = navigator.backStack(),
         modifier = modifier,
@@ -37,10 +57,7 @@ fun MainNavHost(
                         onGameClick = { navigator.navigate(GameDetailsRoute(it)) },
                         hazeState = hazeState,
                         listState = listState,
-                        contentPadding = PaddingValues(
-                            top = contentPadding.calculateTopPadding() + TopBarExpandedHeight,
-                            bottom = contentPadding.calculateBottomPadding(),
-                        ),
+                        contentPadding = contentPaddingWithTopBar,
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
@@ -48,28 +65,18 @@ fun MainNavHost(
                     GameDetailsScreen(
                         gameId = route.gameId,
                         onBack = navigator::goBack,
-                        contentPadding = contentPadding
+                        contentPadding = contentPaddingFoGameDetails
                     )
                 }
                 TopLevelRoute.Search -> NavEntry(route) {
                     SearchScreen(
                         onGameClick = { navigator.navigate(GameDetailsRoute(it)) },
-                        modifier = Modifier.padding(
-                            PaddingValues(
-                                top = contentPadding.calculateTopPadding() + TopBarExpandedHeight,
-                                bottom = contentPadding.calculateBottomPadding(),
-                            )
-                        )
+                        modifier = Modifier.padding(contentPaddingWithTopBar)
                     )
                 }
                 TopLevelRoute.Settings -> NavEntry(route) {
                     SettingsScreen(
-                        modifier = Modifier.padding(
-                            PaddingValues(
-                                top = contentPadding.calculateTopPadding() + TopBarExpandedHeight,
-                                bottom = contentPadding.calculateBottomPadding(),
-                            )
-                        )
+                        modifier = Modifier.padding(contentPaddingWithTopBar)
                     )
                 }
                 else -> error("Unknown route: $route")
