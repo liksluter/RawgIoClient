@@ -1,11 +1,16 @@
 package mr.liks.feature.details.impl.presentation
 
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -15,6 +20,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mr.liks.core.common.applocagger.AppLogger
+import mr.liks.core.media.TrailerPlayerController
 import mr.liks.core.model.GameDetails
 import mr.liks.core.model.GameMedia
 import mr.liks.core.model.Trailer
@@ -25,7 +31,6 @@ import mr.liks.feature.details.impl.domain.usecase.RefreshGameMediaUseCase
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -43,19 +48,23 @@ class GameDetailsViewModelTest {
     private val refreshDetails = mockk<RefreshGameDetailsUseCase>()
     private val refreshMedia = mockk<RefreshGameMediaUseCase>()
     private val logger = mockk<AppLogger>(relaxed = true)
+    private val trailerPlayerController = mockk<TrailerPlayerController>(relaxed = true)
 
     private lateinit var viewModel: GameDetailsViewModel
 
     @Before
     fun setUp() {
-        viewModel = GameDetailsViewModel(
-            getGameDetails = getGameDetails,
-            getGameMedia = getGameMedia,
-            refreshDetails = refreshDetails,
-            refreshMedia = refreshMedia,
-            logger = logger
-        )
+        viewModel = createViewModel()
     }
+
+    private fun createViewModel() = GameDetailsViewModel(
+        getGameDetails = getGameDetails,
+        getGameMedia = getGameMedia,
+        refreshDetails = refreshDetails,
+        refreshMedia = refreshMedia,
+        trailerPlayerController = trailerPlayerController,
+        logger = logger
+    )
 
     @Test
     fun `loadGameDetails observes details and media`() = runTest {
@@ -88,6 +97,30 @@ class GameDetailsViewModelTest {
     }
 
     @Test
+    fun `loadGameDetails with same gameId does not reset state`() = runTest {
+        val details = mockk<GameDetails>(relaxed = true)
+        every { getGameDetails(1L) } returns flowOf(details)
+        every { getGameMedia(1L) } returns flowOf(
+            GameMedia(trailers = emptyList(), screenshots = emptyList())
+        )
+        coEvery { refreshDetails(1L) } just runs
+        coEvery { refreshMedia(1L) } just runs
+
+        viewModel.loadGameDetails(1L)
+        advanceUntilIdle()
+        viewModel.onIntent(GameDetailsIntent.OpenMedia(3))
+
+        viewModel.loadGameDetails(1L)
+        advanceUntilIdle()
+
+        assertEquals(3, viewModel.uiState.value.selectedMediaIndex)
+        assertEquals(details, viewModel.uiState.value.details)
+
+        verify(exactly = 1) { getGameDetails(1L) }
+        verify(exactly = 1) { getGameMedia(1L) }
+    }
+
+    @Test
     fun `refresh failure updates error and emits snackbar`() = runTest {
         every { getGameDetails(1L) } returns flowOf(null)
         every { getGameMedia(1L) } returns flowOf(
@@ -109,12 +142,19 @@ class GameDetailsViewModelTest {
     }
 
     @Test
-    fun `OpenMedia and CloseMedia update selectedMediaIndex`() {
+    fun `OpenMedia updates selectedMediaIndex`() {
         viewModel.onIntent(GameDetailsIntent.OpenMedia(2))
         assertEquals(2, viewModel.uiState.value.selectedMediaIndex)
+    }
+
+    @Test
+    fun `CloseMedia clears selection and pauses player`() {
+        viewModel.onIntent(GameDetailsIntent.OpenMedia(2))
 
         viewModel.onIntent(GameDetailsIntent.CloseMedia)
+
         assertNull(viewModel.uiState.value.selectedMediaIndex)
+        verify { trailerPlayerController.pause() }
     }
 
     @Test
@@ -122,6 +162,28 @@ class GameDetailsViewModelTest {
         viewModel.onIntent(GameDetailsIntent.DismissError)
 
         assertNull(viewModel.uiState.value.errorMessage)
+    }
+
+    @Test
+    fun `clearing viewModel releases player`() {
+        val store = ViewModelStore()
+        val factory = viewModelFactory {
+            initializer {
+                GameDetailsViewModel(
+                    getGameDetails = getGameDetails,
+                    getGameMedia = getGameMedia,
+                    refreshDetails = refreshDetails,
+                    refreshMedia = refreshMedia,
+                    trailerPlayerController = trailerPlayerController,
+                    logger = logger
+                )
+            }
+        }
+        ViewModelProvider(store, factory)[GameDetailsViewModel::class.java]
+
+        store.clear()
+
+        verify { trailerPlayerController.release() }
     }
 }
 

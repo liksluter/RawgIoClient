@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -35,6 +36,7 @@ import androidx.compose.ui.window.DialogProperties
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
 import mr.liks.core.media.TrailerPlayer
+import mr.liks.core.media.TrailerPlayerController
 import mr.liks.core.model.GameMedia
 import mr.liks.core.model.MediaItem
 
@@ -43,6 +45,7 @@ import mr.liks.core.model.MediaItem
 fun MediaViewerDialog(
     media: GameMedia,
     initialIndex: Int,
+    playerController: TrailerPlayerController,
     onDismiss: () -> Unit
 ) {
     val items = remember(media) { media.all }
@@ -55,6 +58,15 @@ fun MediaViewerDialog(
         initialPage = initialIndex.coerceIn(0, items.lastIndex),
         pageCount = { items.size }
     )
+
+    LaunchedEffect(pagerState.currentPage, items) {
+        val item = items.getOrNull(pagerState.currentPage)
+        if (item is MediaItem.Trailer && item.value.playbackUrl != null) {
+            playerController.resume()
+        } else {
+            playerController.pause()
+        }
+    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -74,7 +86,7 @@ fun MediaViewerDialog(
             ) { page ->
                 val item = items[page]
                 when (item) {
-                    is MediaItem.Trailer -> TrailerPage(item)
+                    is MediaItem.Trailer -> TrailerPage(item, playerController)
                     is MediaItem.Screenshot -> ScreenshotPage(item)
                 }
             }
@@ -97,18 +109,22 @@ fun MediaViewerDialog(
 }
 
 @Composable
-private fun TrailerPage(item: MediaItem.Trailer) {
+private fun TrailerPage(
+    item: MediaItem.Trailer,
+    playerController: TrailerPlayerController
+) {
     val url = item.value.playbackUrl
     if (url == null) {
         ScreenshotPage(image = item.value.preview)
-    } else {
-        Box(modifier = Modifier.fillMaxSize()) {
-            TrailerPlayer(
-                trailerUrl = url,
-                autoPlay = true,
-                modifier = Modifier.fillMaxSize()
-            )
-        }
+        return
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        TrailerPlayer(
+            url = url,
+            controller = playerController,
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }
 

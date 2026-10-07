@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mr.liks.core.common.applocagger.AppLogger
+import mr.liks.core.media.TrailerPlayerController
 import mr.liks.feature.details.impl.domain.usecase.GetGameDetailsUseCase
 import mr.liks.feature.details.impl.domain.usecase.GetGameMediaUseCase
 import mr.liks.feature.details.impl.domain.usecase.RefreshGameDetailsUseCase
@@ -24,6 +25,7 @@ import mr.liks.feature.details.impl.domain.usecase.RefreshGameMediaUseCase
  * @property getGameMedia usecase потока медиа из БД
  * @property refreshDetails usecase обновления деталей игры из сети
  * @property refreshMedia usecase обновления медиа из сети
+ * @property trailerPlayerController контроллер для видеопроигрывателя
  * @property logger логер
  */
 class GameDetailsViewModel(
@@ -31,7 +33,8 @@ class GameDetailsViewModel(
     private val getGameMedia: GetGameMediaUseCase,
     private val refreshDetails: RefreshGameDetailsUseCase,
     private val refreshMedia: RefreshGameMediaUseCase,
-    private val logger: AppLogger
+    val trailerPlayerController: TrailerPlayerController,
+    private val logger: AppLogger,
 ) : ViewModel() {
     private var gameId: Long = 0
     private var detailsJob: Job? = null
@@ -47,6 +50,8 @@ class GameDetailsViewModel(
 
     /** Загружает детали и медия игры с идентификатором [gameId] */
     fun loadGameDetails(gameId: Long) {
+        if (gameId == this.gameId && _uiState.value.details != null) return
+
         _uiState.value = GameDetailsUiState()
         this.gameId = gameId
         observeDetails()
@@ -64,8 +69,16 @@ class GameDetailsViewModel(
             is GameDetailsIntent.OpenMedia ->
                 _uiState.update { it.copy(selectedMediaIndex = intent.index) }
             GameDetailsIntent.CloseMedia ->
-                _uiState.update { it.copy(selectedMediaIndex = null) }
+                _uiState.update {
+                    trailerPlayerController.pause()
+                    it.copy(selectedMediaIndex = null)
+                }
         }
+    }
+
+    override fun onCleared() {
+        trailerPlayerController.release()
+        super.onCleared()
     }
 
     private fun observeDetails() {
