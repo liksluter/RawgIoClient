@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
@@ -36,6 +37,7 @@ import mr.liks.core.ui.component.ErrorFooter
 import mr.liks.core.ui.component.FeedEmpty
 import mr.liks.core.ui.component.FeedError
 import mr.liks.core.ui.component.LoadingFooter
+import mr.liks.feature.search.impl.R
 import mr.liks.feature.search.impl.presentation.component.SearchHistoryRow
 import mr.liks.feature.search.impl.presentation.component.SearchResultItem
 import mr.liks.feature.search.impl.presentation.component.SearchResultPlaceholderList
@@ -103,7 +105,7 @@ private fun SearchField(
                 horizontal = RawgTheme.spacing.large,
                 vertical = RawgTheme.spacing.small
             ),
-        placeholder = { Text("Поиск игр") },
+        placeholder = { Text(stringResource(R.string.search_query_hint)) },
         singleLine = true,
         leadingIcon = {
             Icon(imageVector = Icons.Filled.Search, contentDescription = null)
@@ -113,7 +115,7 @@ private fun SearchField(
                 IconButton(onClick = onClear) {
                     Icon(
                         imageVector = Icons.Filled.Close,
-                        contentDescription = "Очистить"
+                        contentDescription = stringResource(R.string.clear)
                     )
                 }
             }
@@ -142,7 +144,7 @@ private fun HistoryContent(
     if (history.isEmpty()) {
         FeedEmpty(
             modifier = modifier.fillMaxSize(),
-            message = "Введите запрос, чтобы найти игру"
+            message = stringResource(R.string.empty_search_feed_message)
         )
         return
     }
@@ -182,7 +184,7 @@ private fun ResultsContent(
 
         is LoadState.Error -> {
             FeedError(
-                message = refresh.error.message ?: "Не удалось выполнить поиск",
+                message = refresh.error.message ?: stringResource(R.string.search_error_message),
                 onRetry = { results.retry() },
                 modifier = modifier.fillMaxSize()
             )
@@ -192,7 +194,7 @@ private fun ResultsContent(
             if (results.itemCount == 0) {
                 FeedEmpty(
                     modifier = modifier.fillMaxSize(),
-                    message = "Ничего не найдено"
+                    message = stringResource(R.string.search_empty_result_message)
                 )
             } else {
                 LazyColumn(

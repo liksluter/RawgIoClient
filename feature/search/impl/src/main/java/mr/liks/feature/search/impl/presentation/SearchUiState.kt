@@ -15,6 +15,4 @@ data class SearchUiState(
     val history: List<SearchHistoryItem> = emptyList(),
     val showHistory: Boolean = true,
     val errorMessage: String? = null
-) {
-    val isQueryBlank: Boolean get() = query.isBlank()
-}
+)

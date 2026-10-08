@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="delete_search_content_description">Удалить из истории</string>
+    <string name="platform_template">Платформы: %s</string>
+    <string name="search_query_hint">Поиск игр</string>
+    <string name="clear">Очистить</string>
+    <string name="empty_search_feed_message">Введите запрос, чтобы найти игру</string>
+    <string name="search_error_message">Не удалось выполнить поиск</string>
+    <string name="search_empty_result_message">Ничего не найдено</string>
+    <string name="delete_search_record_error">Не удалось удалить запись</string>
+</resources>
