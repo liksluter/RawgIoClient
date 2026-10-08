@@ -16,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mr.liks.core.designsystem.theme.RawgTheme
 import mr.liks.core.model.ThemeMode
@@ -24,6 +25,7 @@ import mr.liks.feature.settings.impl.presentation.component.CacheSizeRow
 import mr.liks.feature.settings.impl.presentation.component.SettingsToggleRow
 import org.koin.androidx.compose.koinViewModel
 import androidx.core.net.toUri
+import mr.liks.feature.settings.impl.R
 
 /** Экран настроек */
 @Composable
@@ -55,7 +57,7 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(RawgTheme.spacing.extraSmall)
         ) {
             item("header_appearance") {
-                SectionHeader("Внешний вид")
+                SectionHeader(stringResource(R.string.appearance))
             }
 
             item("theme") {
@@ -67,11 +69,11 @@ fun SettingsScreen(
 
             item("dynamic_color") {
                 SettingsToggleRow(
-                    title = "Динамические цвета",
+                    title = stringResource(R.string.dynamic_colors_title),
                     subtitle = if (uiState.supportsDynamicColor) {
-                        "Использовать цвета обоев (Android 12+)"
+                        stringResource(R.string.dynamic_colors_subtitle_on_support)
                     } else {
-                        "Доступно на Android 12+"
+                        stringResource(R.string.dynamic_colors_subtitle_on_disallow)
                     },
                     checked = uiState.dynamicColor,
                     onCheckedChange = {
@@ -84,7 +86,7 @@ fun SettingsScreen(
             item("divider_1") { HorizontalDivider() }
 
             item("header_storage") {
-                SectionHeader("Хранилище")
+                SectionHeader(stringResource(R.string.storage_title))
             }
 
             item("cache") {
@@ -98,7 +100,7 @@ fun SettingsScreen(
             item("divider_2") { HorizontalDivider() }
 
             item("header_about") {
-                SectionHeader("О приложении")
+                SectionHeader(stringResource(R.string.about_title))
             }
 
             item("about") {
@@ -150,9 +152,9 @@ private fun ThemeSelector(
                 )
                 Text(
                     text = when (mode) {
-                        ThemeMode.System -> "Как в системе"
-                        ThemeMode.Light -> "Светлая"
-                        ThemeMode.Dark -> "Тёмная"
+                        ThemeMode.System -> stringResource(R.string.system_theme)
+                        ThemeMode.Light -> stringResource(R.string.light_theme)
+                        ThemeMode.Dark -> stringResource(R.string.dark_theme)
                     },
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(start = RawgTheme.spacing.small)

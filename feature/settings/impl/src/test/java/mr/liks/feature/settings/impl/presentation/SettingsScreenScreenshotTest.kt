@@ -60,6 +60,7 @@ class SettingsScreenScreenshotTest {
             setDynamicColor = mockk(relaxed = true),
             getCacheSize = mockk(relaxed = true),
             clearCache = mockk(relaxed = true),
+            stringProvider = mockk(relaxed = true),
             appVersion = "1.0.0",
             logger = mockk(relaxed = true)
         )

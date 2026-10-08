@@ -9,7 +9,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import mr.liks.core.designsystem.theme.RawgTheme
+import mr.liks.feature.settings.impl.R
 
 /** Секция "О приложении" */
 @Composable
@@ -18,15 +20,17 @@ fun AboutSection(
     onOpenUrl: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val rawgIoUrl = stringResource(R.string.rawg_io_url)
+
     Column(modifier = modifier.fillMaxWidth()) {
         AboutRow(
-            title = "Версия",
+            title = stringResource(R.string.version),
             value = appVersion
         )
         AboutRow(
-            title = "Данные предоставлены",
-            value = "rawg.io",
-            onClick = { onOpenUrl("https://rawg.io") }
+            title = stringResource(R.string.data_source_service),
+            value = stringResource(R.string.rawg_io_domain),
+            onClick = { onOpenUrl(rawgIoUrl) }
         )
     }
 }

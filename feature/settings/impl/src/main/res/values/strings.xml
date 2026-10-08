@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="version">Версия</string>
+    <string name="data_source_service">Данные предоставлены</string>
+    <string name="rawg_io_domain">rawg.io</string>
+    <string name="rawg_io_url">https://rawg.io</string>
+    <string name="cache_size_title">Размер кеша</string>
+    <string name="clear">Очистить</string>
+    <string name="appearance">Внешний вид</string>
+    <string name="dynamic_colors_title">Динамические цвета</string>
+    <string name="dynamic_colors_subtitle_on_support">Использовать цвета обоев (Android 12+)</string>
+    <string name="dynamic_colors_subtitle_on_disallow">Доступно на Android 12+</string>
+    <string name="storage_title">Хранилище</string>
+    <string name="about_title">О приложении</string>
+    <string name="system_theme">Как в системе</string>
+    <string name="light_theme">Светлая</string>
+    <string name="dark_theme">Тёмная</string>
+    <string name="error">Ошибка</string>
+    <string name="cache_cleared">Кеш очищен</string>
+    <string name="clear_cache_error">Не удалось очистить кеш</string>
+</resources>
