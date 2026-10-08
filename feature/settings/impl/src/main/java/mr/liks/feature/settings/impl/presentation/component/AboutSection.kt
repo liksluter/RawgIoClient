@@ -28,11 +28,6 @@ fun AboutSection(
             value = "rawg.io",
             onClick = { onOpenUrl("https://rawg.io") }
         )
-        AboutRow(
-            title = "Политика конфиденциальности",
-            value = null,
-            onClick = { onOpenUrl("https://rawg.io/privacy-policy") }
-        )
     }
 }
 

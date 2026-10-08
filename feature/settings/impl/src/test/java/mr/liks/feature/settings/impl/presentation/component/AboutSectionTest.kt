@@ -26,7 +26,6 @@ class AboutSectionTest {
         composeRule.onNodeWithText("1.2.3").assertExists()
         composeRule.onNodeWithText("Данные предоставлены").assertExists()
         composeRule.onNodeWithText("rawg.io").assertExists()
-        composeRule.onNodeWithText("Политика конфиденциальности").assertExists()
     }
 
     @Test
@@ -41,19 +40,5 @@ class AboutSectionTest {
 
         composeRule.onNodeWithText("rawg.io").performClick()
         assert(openedUrl == "https://rawg.io")
-    }
-
-    @Test
-    fun `click on privacy policy opens url`() {
-        var openedUrl: String? = null
-        composeRule.setContent {
-            AboutSection(
-                appVersion = "1.0.0",
-                onOpenUrl = { openedUrl = it }
-            )
-        }
-
-        composeRule.onNodeWithText("Политика конфиденциальности").performClick()
-        assert(openedUrl == "https://rawg.io/privacy-policy")
     }
 }
