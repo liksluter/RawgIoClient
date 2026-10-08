@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mr.liks.core.common.StringProvider
 import mr.liks.core.common.applocagger.AppLogger
 import mr.liks.core.model.AppSettings
 import mr.liks.core.model.ThemeMode
@@ -38,6 +39,7 @@ class SettingsViewModelTest {
     private val setDynamicColor: SetDynamicColorUseCase = mockk(relaxed = true)
     private val getCacheSize: GetCacheSizeUseCase = mockk()
     private val clearCache: ClearCacheUseCase = mockk(relaxed = true)
+    private val stringProvider: StringProvider = mockk(relaxed = true)
     private val logger: AppLogger = mockk(relaxed = true)
 
     private val testDispatcher = StandardTestDispatcher()
@@ -63,6 +65,7 @@ class SettingsViewModelTest {
             setDynamicColor = setDynamicColor,
             getCacheSize = getCacheSize,
             clearCache = clearCache,
+            stringProvider = stringProvider,
             appVersion = "1.0.0",
             logger = logger
         )
@@ -196,12 +199,14 @@ class SettingsViewModelTest {
     @Test
     fun `clearCache success sends snackbar effect`() = runTest {
         createViewModel()
+        val cacheCleared = "Кеш очищен"
+        every { stringProvider.getString(any()) } returns cacheCleared
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.effects.test {
             viewModel.onIntent(SettingsIntent.ClearCache)
             testDispatcher.scheduler.advanceUntilIdle()
-            assertEquals(SettingsEffect.ShowSnackbar("Кеш очищен"), awaitItem())
+            assertEquals(SettingsEffect.ShowSnackbar(cacheCleared), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -13,8 +13,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mr.liks.core.designsystem.theme.RawgTheme
+import mr.liks.feature.settings.impl.R
 import java.util.Locale
 
 /** Строка настроек "Размер кеша" с кнопкой очистки */
@@ -37,7 +39,7 @@ fun CacheSizeRow(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Размер кеша",
+                text = stringResource(R.string.cache_size_title),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -58,7 +60,7 @@ fun CacheSizeRow(
                 onClick = onClear,
                 enabled = sizeBytes > 0
             ) {
-                Text("Очистить")
+                Text(stringResource(R.string.clear))
             }
         }
     }

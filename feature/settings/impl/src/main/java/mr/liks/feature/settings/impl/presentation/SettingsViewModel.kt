@@ -13,8 +13,10 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mr.liks.core.common.StringProvider
 import mr.liks.core.common.applocagger.AppLogger
 import mr.liks.core.model.ThemeMode
+import mr.liks.feature.settings.impl.R
 import mr.liks.feature.settings.impl.domain.usecase.ClearCacheUseCase
 import mr.liks.feature.settings.impl.domain.usecase.GetAppSettingsUseCase
 import mr.liks.feature.settings.impl.domain.usecase.GetCacheSizeUseCase
@@ -29,6 +31,7 @@ import mr.liks.feature.settings.impl.domain.usecase.SetThemeUseCase
  * @property setDynamicColor usecase для включения/выключения динамических уветов
  * @property getCacheSize usecase дял получения размера кеша
  * @property clearCache usecase для очистки кеша
+ * @property stringProvider провайдер строк
  * @property appVersion версия приложения
  * @property logger логер
  */
@@ -38,6 +41,7 @@ class SettingsViewModel(
     private val setDynamicColor: SetDynamicColorUseCase,
     private val getCacheSize: GetCacheSizeUseCase,
     private val clearCache: ClearCacheUseCase,
+    private val stringProvider: StringProvider,
     private val appVersion: String = "0.0.1", // todo передавать версию из BuildConfig
     private val logger: AppLogger
 ) : ViewModel() {
@@ -53,6 +57,8 @@ class SettingsViewModel(
     private val _effects = Channel<SettingsEffect>(capacity = Channel.BUFFERED)
     val effects: Flow<SettingsEffect> = _effects.receiveAsFlow()
 
+    private val errorMessage = stringProvider.getString(R.string.error)
+
     init {
         observeSettings()
     }
@@ -64,6 +70,7 @@ class SettingsViewModel(
             SettingsIntent.ClearCache -> onClearCache()
             SettingsIntent.DismissError ->
                 _uiState.update { it.copy(errorMessage = null) }
+
             is SettingsIntent.OpenUrl -> onOpenUrl(intent.url)
         }
     }
@@ -81,7 +88,7 @@ class SettingsViewModel(
             runCatching { setTheme(mode) }
                 .onFailure { t ->
                     logger.e(t, "Failed to set theme")
-                    _uiState.update { it.copy(errorMessage = t.message ?: "Ошибка") }
+                    _uiState.update { it.copy(errorMessage = t.message ?: errorMessage) }
                 }
         }
     }
@@ -91,7 +98,7 @@ class SettingsViewModel(
             runCatching { setDynamicColor(enabled) }
                 .onFailure { t ->
                     logger.e(t, "Failed to set dynamic color")
-                    _uiState.update { it.copy(errorMessage = t.message ?: "Ошибка") }
+                    _uiState.update { it.copy(errorMessage = t.message ?: errorMessage) }
                 }
         }
     }
@@ -108,14 +115,16 @@ class SettingsViewModel(
                             settings = it.settings.copy(cacheSizeBytes = newSize)
                         )
                     }
-                    _effects.send(SettingsEffect.ShowSnackbar("Кеш очищен"))
+                    _effects.send(SettingsEffect
+                        .ShowSnackbar(stringProvider.getString(R.string.cache_cleared)))
                 }
                 .onFailure { t ->
                     logger.e(t, "Failed to clear cache")
                     _uiState.update {
                         it.copy(
                             isClearingCache = false,
-                            errorMessage = t.message ?: "Не удалось очистить кеш"
+                            errorMessage = t.message
+                                ?: stringProvider.getString(R.string.clear_cache_error)
                         )
                     }
                 }
