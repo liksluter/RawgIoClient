@@ -15,9 +15,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mr.liks.core.designsystem.theme.RawgTheme
+import mr.liks.feature.search.impl.R
 
 @Composable
 fun SearchHistoryRow(
@@ -60,7 +62,7 @@ fun SearchHistoryRow(
         ) {
             Icon(
                 imageVector = Icons.Filled.Close,
-                contentDescription = "Удалить из истории",
+                contentDescription = stringResource(R.string.delete_search_content_description),
                 modifier = Modifier.size(18.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )

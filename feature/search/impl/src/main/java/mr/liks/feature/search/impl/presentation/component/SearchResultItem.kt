@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -22,6 +23,7 @@ import coil3.compose.AsyncImage
 import mr.liks.core.designsystem.theme.RawgTheme
 import mr.liks.core.model.GamePreview
 import mr.liks.core.ui.component.RatingBadge
+import mr.liks.feature.search.impl.R
 
 @Composable
 fun SearchResultItem(
@@ -95,7 +97,7 @@ fun SearchResultItem(
 
             game.platformsNames?.let {
                 Text(
-                    text = "Платформы: $it",
+                    text = stringResource(R.string.platform_template, it),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,

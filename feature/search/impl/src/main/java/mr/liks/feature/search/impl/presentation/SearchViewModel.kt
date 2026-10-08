@@ -20,8 +20,10 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mr.liks.core.common.StringProvider
 import mr.liks.core.common.applocagger.AppLogger
 import mr.liks.core.model.GamePreview
+import mr.liks.feature.search.impl.R
 import mr.liks.feature.search.impl.domain.usecase.DeleteSearchHistoryItemUseCase
 import mr.liks.feature.search.impl.domain.usecase.GetSearchHistoryUseCase
 import mr.liks.feature.search.impl.domain.usecase.SaveSearchQueryUseCase
@@ -34,6 +36,7 @@ import mr.liks.feature.search.impl.domain.usecase.SearchGamesUseCase
  * @property getSearchHistory usecase для получения flow истории поиска
  * @property saveSearchQuery usecase для сохранения запроса в историю
  * @property deleteSearchHistoryItem usecase для удаления запроса из истории
+ * @property stringProvider провайдер строк
  * @property logger логер
  */
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -42,6 +45,7 @@ class SearchViewModel(
     private val getSearchHistory: GetSearchHistoryUseCase,
     private val saveSearchQuery: SaveSearchQueryUseCase,
     private val deleteSearchHistoryItem: DeleteSearchHistoryItemUseCase,
+    private val stringProvider: StringProvider,
     private val logger: AppLogger
 ) : ViewModel() {
 
@@ -120,7 +124,8 @@ class SearchViewModel(
                 .onFailure { t ->
                     logger.w(t, "Failed to delete search history item")
                     _uiState.update {
-                        it.copy(errorMessage = t.message ?: "Не удалось удалить запись")
+                        it.copy(errorMessage = t.message
+                            ?: stringProvider.getString(R.string.delete_search_record_error))
                     }
                 }
         }
