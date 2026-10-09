@@ -19,6 +19,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mr.liks.core.common.StringProvider
 import mr.liks.core.common.applocagger.AppLogger
 import mr.liks.core.media.TrailerPlayerController
 import mr.liks.core.model.GameDetails
@@ -49,6 +50,7 @@ class GameDetailsViewModelTest {
     private val refreshMedia = mockk<RefreshGameMediaUseCase>()
     private val logger = mockk<AppLogger>(relaxed = true)
     private val trailerPlayerController = mockk<TrailerPlayerController>(relaxed = true)
+    private val stringProvider: StringProvider = mockk(relaxed = true)
 
     private lateinit var viewModel: GameDetailsViewModel
 
@@ -62,6 +64,7 @@ class GameDetailsViewModelTest {
         getGameMedia = getGameMedia,
         refreshDetails = refreshDetails,
         refreshMedia = refreshMedia,
+        stringProvider = stringProvider,
         trailerPlayerController = trailerPlayerController,
         logger = logger
     )
@@ -174,6 +177,7 @@ class GameDetailsViewModelTest {
                     getGameMedia = getGameMedia,
                     refreshDetails = refreshDetails,
                     refreshMedia = refreshMedia,
+                    stringProvider = stringProvider,
                     trailerPlayerController = trailerPlayerController,
                     logger = logger
                 )

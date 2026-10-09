@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -39,6 +40,7 @@ import mr.liks.core.media.TrailerPlayer
 import mr.liks.core.media.TrailerPlayerController
 import mr.liks.core.model.GameMedia
 import mr.liks.core.model.MediaItem
+import mr.liks.feature.details.impl.R
 
 /** Полноэкранный диалог просмотра медиа */
 @Composable
@@ -100,7 +102,7 @@ fun MediaViewerDialog(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Close,
-                    contentDescription = "Закрыть",
+                    contentDescription = stringResource(R.string.close),
                     tint = Color.White
                 )
             }

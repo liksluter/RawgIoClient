@@ -16,11 +16,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mr.liks.core.designsystem.theme.RawgTheme
 import mr.liks.core.ui.component.FeedError
+import mr.liks.feature.details.impl.R
 import mr.liks.feature.details.impl.presentation.component.DetailsHeader
 import mr.liks.feature.details.impl.presentation.component.GameDetailsPlaceholder
 import mr.liks.feature.details.impl.presentation.component.MediaPager
@@ -60,7 +62,8 @@ fun GameDetailsScreen(
 
         uiState.details == null -> {
             FeedError(
-                message = uiState.errorMessage ?: "Не удалось загрузить игру",
+                message = uiState.errorMessage
+                    ?: stringResource(R.string.details_load_error_message),
                 onRetry = { viewModel.onIntent(GameDetailsIntent.Retry) },
                 modifier = Modifier.fillMaxSize()
             )
@@ -128,7 +131,7 @@ private fun DetailsContent(
                     }
 
                     Text(
-                        text = "Об игре",
+                        text = stringResource(R.string.about),
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(Modifier.height(RawgTheme.spacing.small))

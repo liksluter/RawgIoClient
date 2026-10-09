@@ -21,12 +21,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import mr.liks.core.designsystem.theme.MediaShape
 import mr.liks.core.designsystem.theme.RawgTheme
 import mr.liks.core.model.GameMedia
 import mr.liks.core.model.MediaItem
+import mr.liks.feature.details.impl.R
 
 /** Лента превью медиа */
 @Composable
@@ -107,7 +109,7 @@ private fun MediaPreview(
             ) {
                 Icon(
                     imageVector = Icons.Filled.PlayArrow,
-                    contentDescription = "Воспроизвести",
+                    contentDescription = stringResource(R.string.play),
                     tint = Color.White
                 )
             }

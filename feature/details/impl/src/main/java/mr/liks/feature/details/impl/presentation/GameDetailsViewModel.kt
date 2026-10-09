@@ -11,8 +11,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mr.liks.core.common.StringProvider
 import mr.liks.core.common.applocagger.AppLogger
 import mr.liks.core.media.TrailerPlayerController
+import mr.liks.feature.details.impl.R
 import mr.liks.feature.details.impl.domain.usecase.GetGameDetailsUseCase
 import mr.liks.feature.details.impl.domain.usecase.GetGameMediaUseCase
 import mr.liks.feature.details.impl.domain.usecase.RefreshGameDetailsUseCase
@@ -33,6 +35,7 @@ class GameDetailsViewModel(
     private val getGameMedia: GetGameMediaUseCase,
     private val refreshDetails: RefreshGameDetailsUseCase,
     private val refreshMedia: RefreshGameMediaUseCase,
+    private val stringProvider: StringProvider,
     val trailerPlayerController: TrailerPlayerController,
     private val logger: AppLogger,
 ) : ViewModel() {
@@ -125,12 +128,13 @@ class GameDetailsViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoadingDetails = false,
-                                errorMessage = t.message ?: "Не удалось загрузить игру"
+                                errorMessage = t.message
+                                    ?: stringProvider.getString(R.string.details_load_error_message)
                             )
                         }
                         _effects.send(
                             GameDetailsEffect.ShowSnackbar(
-                                t.message ?: "Не удалось загрузить игру"
+                                t.message ?: stringProvider.getString(R.string.details_load_error_message)
                             )
                         )
                     }

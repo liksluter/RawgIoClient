@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
@@ -38,6 +39,7 @@ import mr.liks.core.designsystem.theme.RawgTheme
 import mr.liks.core.designsystem.theme.mediaOverlayScrim
 import mr.liks.core.model.GameDetails
 import mr.liks.core.ui.component.RatingBadge
+import mr.liks.feature.details.impl.R
 
 /** Заголовок экрана деталей */
 @Composable
@@ -85,7 +87,7 @@ fun DetailsHeader(
         if (details.genres.isNotEmpty()) {
             Spacer(Modifier.height(RawgTheme.spacing.medium))
             InfoRow(
-                label = "Жанр",
+                label = stringResource(R.string.genre),
                 value = details.genres.joinToString { it.name }
             )
         }
@@ -93,7 +95,7 @@ fun DetailsHeader(
         if (details.platforms.isNotEmpty()) {
             Spacer(Modifier.height(RawgTheme.spacing.medium))
             InfoRow(
-                label = "Платформы",
+                label = stringResource(R.string.platforms),
                 value = details.platforms.joinToString { it.name }
             )
         }
@@ -101,7 +103,7 @@ fun DetailsHeader(
         if (details.developers.isNotEmpty()) {
             Spacer(Modifier.height(RawgTheme.spacing.medium))
             InfoRow(
-                label = "Разработчик",
+                label = stringResource(R.string.developer),
                 value = details.developers.joinToString { it.name }
             )
         }
@@ -109,7 +111,7 @@ fun DetailsHeader(
         if (details.publishers.isNotEmpty()) {
             Spacer(Modifier.height(RawgTheme.spacing.small))
             InfoRow(
-                label = "Издатель",
+                label = stringResource(R.string.publisher),
                 value = details.publishers.joinToString { it.name }
             )
         }
@@ -117,7 +119,7 @@ fun DetailsHeader(
         if (!details.released.isNullOrEmpty()) {
             Spacer(Modifier.height(RawgTheme.spacing.small))
             InfoRow(
-                label = "Дата релиза",
+                label = stringResource(R.string.released),
                 value = details.released ?: ""
             )
         }

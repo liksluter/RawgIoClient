@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="genre">Жанр</string>
+    <string name="platforms">Платформы</string>
+    <string name="developer">Разработчик</string>
+    <string name="publisher">Издатель</string>
+    <string name="released">Дата релиза</string>
+    <string name="play">Воспроизвести</string>
+    <string name="close">Закрыть</string>
+    <string name="details_load_error_message">Не удалось загрузить игру</string>
+    <string name="about">Об игре</string>
+</resources>
