@@ -2,7 +2,6 @@ package mr.liks.feature.feed.impl.presentation
 
 /** Намерения пользователя на экране ленты */
 sealed interface FeedIntent {
-
     /** Обновить ленту */
     data object Refresh : FeedIntent
 

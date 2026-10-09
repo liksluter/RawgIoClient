@@ -9,6 +9,4 @@ package mr.liks.feature.feed.impl.presentation
 data class FeedUiState(
     val isRefreshing: Boolean = false,
     val errorMessage: String? = null
-) {
-    val isEmpty: Boolean get() = !isRefreshing && errorMessage == null
-}
+)

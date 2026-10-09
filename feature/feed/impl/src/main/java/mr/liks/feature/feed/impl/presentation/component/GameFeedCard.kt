@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import coil3.compose.AsyncImagePainter
@@ -40,6 +41,7 @@ import mr.liks.core.media.TrailerPreview
 import mr.liks.core.model.GamePreview
 import mr.liks.core.ui.component.RatingBadge
 import mr.liks.core.ui.effect.shimmer
+import mr.liks.feature.feed.impl.R
 
 /** Карточка игры в ленте */
 @Composable
@@ -74,7 +76,7 @@ fun GameFeedCard(
             ) {
                 game.genres.takeIf { !it.isNullOrEmpty() }?.let {
                     Text(
-                        text = "Жанр: $it",
+                        text = stringResource(R.string.genre_template, it),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Thin,
                         modifier = Modifier
@@ -87,7 +89,7 @@ fun GameFeedCard(
                 }
                 game.platformsNames.takeIf { !it.isNullOrEmpty() }?.let {
                     Text(
-                        text = "Платформы: $it",
+                        text = stringResource(R.string.platforms_template, it),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Thin,
                         modifier = Modifier
