@@ -12,8 +12,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mr.liks.core.common.StringProvider
 import mr.liks.core.common.applocagger.AppLogger
 import mr.liks.core.model.GamePreview
+import mr.liks.feature.feed.impl.R
 import mr.liks.feature.feed.impl.domain.usecase.GetFeedPagingDataUseCase
 import mr.liks.feature.feed.impl.domain.usecase.RefreshFeedUseCase
 
@@ -27,6 +29,7 @@ import mr.liks.feature.feed.impl.domain.usecase.RefreshFeedUseCase
 class FeedViewModel(
     getFeedPagingData: GetFeedPagingDataUseCase,
     private val refreshFeed: RefreshFeedUseCase,
+    private val stringProvider: StringProvider,
     private val logger: AppLogger
 ) : ViewModel() {
     val feed: Flow<PagingData<GamePreview>> = getFeedPagingData()
@@ -59,7 +62,8 @@ class FeedViewModel(
                     _uiState.update {
                         it.copy(
                             isRefreshing = false,
-                            errorMessage = throwable.message ?: "Не удалось обновить ленту"
+                            errorMessage = throwable.message
+                                ?: stringProvider.getString(R.string.feed_refresh_error_message)
                         )
                     }
                 }

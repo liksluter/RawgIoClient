@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="genre_template">Жанр: %s</string>
+    <string name="platforms_template">Платформы: %s</string>
+    <string name="feed_load_error_message">Не удалось загрузить ленту</string>
+    <string name="feed_refresh_error_message">Не удалось обновить ленту</string>
+</resources>

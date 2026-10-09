@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mr.liks.core.common.StringProvider
 import mr.liks.core.common.applocagger.AppLogger
 import mr.liks.feature.feed.impl.domain.usecase.GetFeedPagingDataUseCase
 import mr.liks.feature.feed.impl.domain.usecase.RefreshFeedUseCase
@@ -24,9 +25,9 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FeedViewModelTest {
-
     private val getFeedPagingData: GetFeedPagingDataUseCase = mockk()
     private val refreshFeed: RefreshFeedUseCase = mockk()
+    private val stringProvider: StringProvider = mockk(relaxed = true)
     private val logger: AppLogger = mockk(relaxed = true)
 
     private val testDispatcher = StandardTestDispatcher()
@@ -44,7 +45,7 @@ class FeedViewModelTest {
 
     @Test
     fun `initial state is correct`() = runTest {
-        val viewModel = FeedViewModel(getFeedPagingData, refreshFeed, logger)
+        val viewModel = FeedViewModel(getFeedPagingData, refreshFeed, stringProvider, logger)
         val state = viewModel.uiState.value
         assertEquals(false, state.isRefreshing)
         assertNull(state.errorMessage)
@@ -53,7 +54,7 @@ class FeedViewModelTest {
     @Test
     fun `Refresh intent sets isRefreshing then clears on success`() = runTest {
         coEvery { refreshFeed() } returns Unit
-        val viewModel = FeedViewModel(getFeedPagingData, refreshFeed, logger)
+        val viewModel = FeedViewModel(getFeedPagingData, refreshFeed, stringProvider, logger)
 
         viewModel.uiState.test {
             assertEquals(false, awaitItem().isRefreshing)
@@ -68,7 +69,7 @@ class FeedViewModelTest {
     fun `Refresh intent sets error message on failure`() = runTest {
         val error = RuntimeException("Network error")
         coEvery { refreshFeed() } throws error
-        val viewModel = FeedViewModel(getFeedPagingData, refreshFeed, logger)
+        val viewModel = FeedViewModel(getFeedPagingData, refreshFeed, stringProvider, logger)
 
         viewModel.uiState.test {
             assertEquals(false, awaitItem().isRefreshing)
@@ -82,7 +83,7 @@ class FeedViewModelTest {
 
     @Test
     fun `GameClicked sends NavigateToDetails effect`() = runTest {
-        val viewModel = FeedViewModel(getFeedPagingData, refreshFeed, logger)
+        val viewModel = FeedViewModel(getFeedPagingData, refreshFeed, stringProvider, logger)
 
         viewModel.effects.test {
             viewModel.onIntent(FeedIntent.GameClicked(123L))
@@ -93,7 +94,7 @@ class FeedViewModelTest {
     @Test
     fun `DismissError clears error message`() = runTest {
         coEvery { refreshFeed() } throws RuntimeException("Error")
-        val viewModel = FeedViewModel(getFeedPagingData, refreshFeed, logger)
+        val viewModel = FeedViewModel(getFeedPagingData, refreshFeed, stringProvider, logger)
         viewModel.onIntent(FeedIntent.Refresh)
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -104,7 +105,7 @@ class FeedViewModelTest {
     @Test
     fun `Retry intent calls refresh`() = runTest {
         coEvery { refreshFeed() } returns Unit
-        val viewModel = FeedViewModel(getFeedPagingData, refreshFeed, logger)
+        val viewModel = FeedViewModel(getFeedPagingData, refreshFeed, stringProvider, logger)
         viewModel.onIntent(FeedIntent.Retry)
         testDispatcher.scheduler.advanceUntilIdle()
         coVerify(exactly = 1) { refreshFeed() }

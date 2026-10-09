@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
@@ -29,6 +30,7 @@ import mr.liks.core.ui.component.FeedPlaceholder
 import mr.liks.core.ui.component.FeedPlaceholderCard
 import mr.liks.core.ui.component.LoadingFooter
 import mr.liks.core.ui.effect.FeedShimmer
+import mr.liks.feature.feed.impl.R
 import mr.liks.feature.feed.impl.presentation.component.GameFeedCard
 
 @Composable
@@ -62,7 +64,7 @@ internal fun FeedContent(
 
             is LoadState.Error -> {
                 FeedError(
-                    message = refresh.error.message ?: "Не удалось загрузить ленту",
+                    message = refresh.error.message ?: stringResource(R.string.feed_load_error_message),
                     onRetry = onRetry,
                     modifier = Modifier.fillMaxSize()
                 )
