@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mr.liks.core.common.StringProvider
-import mr.liks.core.common.applocagger.AppLogger
 import mr.liks.core.model.SearchHistoryItem
 import mr.liks.feature.search.impl.R
 import mr.liks.feature.search.impl.domain.usecase.DeleteSearchHistoryItemUseCase
@@ -37,7 +36,6 @@ class SearchViewModelTest {
     private val saveSearchQuery = mockk<SaveSearchQueryUseCase>(relaxed = true)
     private val deleteSearchHistoryItem = mockk<DeleteSearchHistoryItemUseCase>(relaxed = true)
     private val stringProvider = mockk<StringProvider>()
-    private val logger = mockk<AppLogger>(relaxed = true)
 
     private lateinit var viewModel: SearchViewModel
 
@@ -56,7 +54,6 @@ class SearchViewModelTest {
         saveSearchQuery = saveSearchQuery,
         deleteSearchHistoryItem = deleteSearchHistoryItem,
         stringProvider = stringProvider,
-        logger = logger
     )
 
     @Test

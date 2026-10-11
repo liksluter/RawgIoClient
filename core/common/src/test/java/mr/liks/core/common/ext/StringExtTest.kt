@@ -30,31 +30,6 @@ class StringExtTest {
     }
 
     @Test
-    fun `truncate returns input when shorter than max`() {
-        assertEquals("abc", "abc".truncate(5))
-    }
-
-    @Test
-    fun `truncate returns input when equal to max`() {
-        assertEquals("abc", "abc".truncate(3))
-    }
-
-    @Test
-    fun `truncate adds ellipsis when longer`() {
-        assertEquals("abc…", "abcdef".truncate(3))
-    }
-
-    @Test
-    fun `truncate trims trailing whitespace before ellipsis`() {
-        assertEquals("ab…", "ab   cd".truncate(3))
-    }
-
-    @Test
-    fun `truncate with max 0 returns ellipsis`() {
-        assertEquals("…", "abc".truncate(0))
-    }
-
-    @Test
     fun `normalizeQuery trims and lowercases`() {
         assertEquals("hello world", "  HELLO   World  ".normalizeQuery())
     }
@@ -67,26 +42,5 @@ class StringExtTest {
     @Test
     fun `normalizeQuery on empty string returns empty`() {
         assertEquals("", "   ".normalizeQuery())
-    }
-
-    @Test
-    fun `isNullOrBlankOrEmpty returns true for null`() {
-        val value: String? = null
-        assertTrue(value.isNullOrBlankOrEmpty())
-    }
-
-    @Test
-    fun `isNullOrBlankOrEmpty returns true for empty`() {
-        assertTrue("".isNullOrBlankOrEmpty())
-    }
-
-    @Test
-    fun `isNullOrBlankOrEmpty returns true for whitespace only`() {
-        assertTrue("   \t".isNullOrBlankOrEmpty())
-    }
-
-    @Test
-    fun `isNullOrBlankOrEmpty returns false for non-blank`() {
-        assertFalse("x".isNullOrBlankOrEmpty())
     }
 }

@@ -13,24 +13,23 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mr.liks.core.common.StringProvider
-import mr.liks.core.common.applocagger.AppLogger
 import mr.liks.core.model.GamePreview
 import mr.liks.feature.feed.impl.R
 import mr.liks.feature.feed.impl.domain.usecase.GetFeedPagingDataUseCase
 import mr.liks.feature.feed.impl.domain.usecase.RefreshFeedUseCase
+import timber.log.Timber
 
 /**
  * ViewModel экрана ленты
  *
- * @property refreshFeed usecase обновления ленты
- * @property logger логгер
  * @param getFeedPagingData usecase потока страниц ленты
+ * @property refreshFeed usecase обновления ленты
+ * @property stringProvider провайдер строк
  */
 class FeedViewModel(
     getFeedPagingData: GetFeedPagingDataUseCase,
     private val refreshFeed: RefreshFeedUseCase,
     private val stringProvider: StringProvider,
-    private val logger: AppLogger
 ) : ViewModel() {
     val feed: Flow<PagingData<GamePreview>> = getFeedPagingData()
         .cachedIn(viewModelScope)
@@ -58,7 +57,7 @@ class FeedViewModel(
                     _uiState.update { it.copy(isRefreshing = false) }
                 }
                 .onFailure { throwable ->
-                    logger.e(throwable, "Feed refresh failed")
+                    Timber.e(throwable, "Feed refresh failed")
                     _uiState.update {
                         it.copy(
                             isRefreshing = false,

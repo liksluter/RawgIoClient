@@ -39,7 +39,6 @@ val SettingsModule = module {
             getCacheSize = get(),
             clearCache = get(),
             stringProvider = get(),
-            logger = get()
         )
     }
 }

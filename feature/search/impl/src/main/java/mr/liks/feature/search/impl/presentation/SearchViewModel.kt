@@ -21,13 +21,13 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mr.liks.core.common.StringProvider
-import mr.liks.core.common.applocagger.AppLogger
 import mr.liks.core.model.GamePreview
 import mr.liks.feature.search.impl.R
 import mr.liks.feature.search.impl.domain.usecase.DeleteSearchHistoryItemUseCase
 import mr.liks.feature.search.impl.domain.usecase.GetSearchHistoryUseCase
 import mr.liks.feature.search.impl.domain.usecase.SaveSearchQueryUseCase
 import mr.liks.feature.search.impl.domain.usecase.SearchGamesUseCase
+import timber.log.Timber
 
 /**
  * [ViewModel] экрана поиска
@@ -37,7 +37,6 @@ import mr.liks.feature.search.impl.domain.usecase.SearchGamesUseCase
  * @property saveSearchQuery usecase для сохранения запроса в историю
  * @property deleteSearchHistoryItem usecase для удаления запроса из истории
  * @property stringProvider провайдер строк
- * @property logger логер
  */
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class SearchViewModel(
@@ -46,9 +45,7 @@ class SearchViewModel(
     private val saveSearchQuery: SaveSearchQueryUseCase,
     private val deleteSearchHistoryItem: DeleteSearchHistoryItemUseCase,
     private val stringProvider: StringProvider,
-    private val logger: AppLogger
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
@@ -113,7 +110,7 @@ class SearchViewModel(
         viewModelScope.launch {
             runCatching { saveSearchQuery(query) }
                 .onFailure { t ->
-                    logger.w(t, "Failed to save search query")
+                    Timber.w(t, "Failed to save search query")
                 }
         }
     }
@@ -122,7 +119,7 @@ class SearchViewModel(
         viewModelScope.launch {
             runCatching { deleteSearchHistoryItem(query) }
                 .onFailure { t ->
-                    logger.w(t, "Failed to delete search history item")
+                    Timber.w(t, "Failed to delete search history item")
                     _uiState.update {
                         it.copy(errorMessage = t.message
                             ?: stringProvider.getString(R.string.delete_search_record_error))

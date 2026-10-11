@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mr.liks.core.common.StringProvider
-import mr.liks.core.common.applocagger.AppLogger
 import mr.liks.core.model.ThemeMode
 import mr.liks.feature.settings.impl.R
 import mr.liks.feature.settings.impl.domain.usecase.ClearCacheUseCase
@@ -22,6 +21,7 @@ import mr.liks.feature.settings.impl.domain.usecase.GetAppSettingsUseCase
 import mr.liks.feature.settings.impl.domain.usecase.GetCacheSizeUseCase
 import mr.liks.feature.settings.impl.domain.usecase.SetDynamicColorUseCase
 import mr.liks.feature.settings.impl.domain.usecase.SetThemeUseCase
+import timber.log.Timber
 
 /**
  * [ViewModel] экрана настроек
@@ -33,7 +33,6 @@ import mr.liks.feature.settings.impl.domain.usecase.SetThemeUseCase
  * @property clearCache usecase для очистки кеша
  * @property stringProvider провайдер строк
  * @property appVersion версия приложения
- * @property logger логер
  */
 class SettingsViewModel(
     private val getAppSettings: GetAppSettingsUseCase,
@@ -43,9 +42,7 @@ class SettingsViewModel(
     private val clearCache: ClearCacheUseCase,
     private val stringProvider: StringProvider,
     private val appVersion: String = "0.0.1", // todo передавать версию из BuildConfig
-    private val logger: AppLogger
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(
         SettingsUiState(
             supportsDynamicColor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
@@ -87,7 +84,7 @@ class SettingsViewModel(
         viewModelScope.launch {
             runCatching { setTheme(mode) }
                 .onFailure { t ->
-                    logger.e(t, "Failed to set theme")
+                    Timber.e(t, "Failed to set theme")
                     _uiState.update { it.copy(errorMessage = t.message ?: errorMessage) }
                 }
         }
@@ -97,7 +94,7 @@ class SettingsViewModel(
         viewModelScope.launch {
             runCatching { setDynamicColor(enabled) }
                 .onFailure { t ->
-                    logger.e(t, "Failed to set dynamic color")
+                    Timber.e(t, "Failed to set dynamic color")
                     _uiState.update { it.copy(errorMessage = t.message ?: errorMessage) }
                 }
         }
@@ -119,7 +116,7 @@ class SettingsViewModel(
                         .ShowSnackbar(stringProvider.getString(R.string.cache_cleared)))
                 }
                 .onFailure { t ->
-                    logger.e(t, "Failed to clear cache")
+                    Timber.e(t, "Failed to clear cache")
                     _uiState.update {
                         it.copy(
                             isClearingCache = false,

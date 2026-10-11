@@ -36,7 +36,6 @@ class FeedScreenTest {
                         getFeedPagingData = mockk(relaxed = true),
                         refreshFeed = mockk(relaxed = true),
                         stringProvider = mockk(relaxed = true),
-                        logger = mockk(relaxed = true)
                     ) }
                 }
             )
