@@ -14,7 +14,7 @@ import mr.liks.core.database.entity.PlatformEntity
 import mr.liks.core.database.entity.PublisherEntity
 
 /**
- * Свзяь информация об игре и ее свойства
+ * Информация об игре, платформы, жанры, разработчики и издатели
  *
  * @property game информацуия об игре
  * @property platforms платформы

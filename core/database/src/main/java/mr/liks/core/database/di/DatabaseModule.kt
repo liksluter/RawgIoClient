@@ -18,7 +18,6 @@ val DatabaseModule = module {
             RawgDatabase::class.java,
             RawgDatabase.NAME
         )
-            .fallbackToDestructiveMigration(dropAllTables = true) // todo только для этапа начальной разработки
             .setQueryCallback(
                 queryCallback = { sqlQuery, bindArgs ->
                     Timber.d("Query: $sqlQuery | Args: $bindArgs")

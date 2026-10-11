@@ -7,7 +7,7 @@ import mr.liks.core.database.entity.ScreenshotEntity
 import mr.liks.core.database.entity.TrailerEntity
 
 /**
- * Свзяь детальная информация об игре и медиа-файлы
+ * Детальная информация об игре, трейлеры и скриншоты
  *
  * @property details детальная информация об игре
  * @property trailers трейлеры

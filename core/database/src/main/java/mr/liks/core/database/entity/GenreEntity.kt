@@ -9,6 +9,7 @@ import androidx.room.PrimaryKey
  * @property id id
  * @property name название
  * @property slug слаг
+ * @property gamesCount кол-во игр
  */
 @Entity(tableName = "genres")
 data class GenreEntity(
