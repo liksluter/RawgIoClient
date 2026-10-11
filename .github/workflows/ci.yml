@@ -5,6 +5,7 @@ on:
     branches:
       - master
     paths-ignore:
+      - 'DATABASE.md'
       - 'README.md'
 
 jobs:
