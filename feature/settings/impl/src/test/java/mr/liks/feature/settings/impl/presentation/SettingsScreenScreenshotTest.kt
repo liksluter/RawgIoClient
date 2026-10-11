@@ -62,7 +62,6 @@ class SettingsScreenScreenshotTest {
             clearCache = mockk(relaxed = true),
             stringProvider = mockk(relaxed = true),
             appVersion = "1.0.0",
-            logger = mockk(relaxed = true)
         )
 
         composeRule.setContent {

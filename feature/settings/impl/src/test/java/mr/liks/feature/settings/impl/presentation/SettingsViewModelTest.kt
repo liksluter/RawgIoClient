@@ -16,7 +16,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mr.liks.core.common.StringProvider
-import mr.liks.core.common.applocagger.AppLogger
 import mr.liks.core.model.AppSettings
 import mr.liks.core.model.ThemeMode
 import mr.liks.feature.settings.impl.domain.usecase.ClearCacheUseCase
@@ -40,8 +39,6 @@ class SettingsViewModelTest {
     private val getCacheSize: GetCacheSizeUseCase = mockk()
     private val clearCache: ClearCacheUseCase = mockk(relaxed = true)
     private val stringProvider: StringProvider = mockk(relaxed = true)
-    private val logger: AppLogger = mockk(relaxed = true)
-
     private val testDispatcher = StandardTestDispatcher()
 
     private lateinit var viewModel: SettingsViewModel
@@ -67,7 +64,6 @@ class SettingsViewModelTest {
             clearCache = clearCache,
             stringProvider = stringProvider,
             appVersion = "1.0.0",
-            logger = logger
         )
     }
 

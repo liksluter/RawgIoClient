@@ -12,13 +12,13 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mr.liks.core.common.StringProvider
-import mr.liks.core.common.applocagger.AppLogger
 import mr.liks.core.media.TrailerPlayerController
 import mr.liks.feature.details.impl.R
 import mr.liks.feature.details.impl.domain.usecase.GetGameDetailsUseCase
 import mr.liks.feature.details.impl.domain.usecase.GetGameMediaUseCase
 import mr.liks.feature.details.impl.domain.usecase.RefreshGameDetailsUseCase
 import mr.liks.feature.details.impl.domain.usecase.RefreshGameMediaUseCase
+import timber.log.Timber
 
 /**
  * ViewModel экрана деталей игры
@@ -27,8 +27,8 @@ import mr.liks.feature.details.impl.domain.usecase.RefreshGameMediaUseCase
  * @property getGameMedia usecase потока медиа из БД
  * @property refreshDetails usecase обновления деталей игры из сети
  * @property refreshMedia usecase обновления медиа из сети
+ * @property stringProvider провайдер строк
  * @property trailerPlayerController контроллер для видеопроигрывателя
- * @property logger логер
  */
 class GameDetailsViewModel(
     private val getGameDetails: GetGameDetailsUseCase,
@@ -37,7 +37,6 @@ class GameDetailsViewModel(
     private val refreshMedia: RefreshGameMediaUseCase,
     private val stringProvider: StringProvider,
     val trailerPlayerController: TrailerPlayerController,
-    private val logger: AppLogger,
 ) : ViewModel() {
     private var gameId: Long = 0
     private var detailsJob: Job? = null
@@ -124,7 +123,7 @@ class GameDetailsViewModel(
                 _uiState.update { it.copy(isLoadingDetails = true, errorMessage = null) }
                 runCatching { refreshDetails(gameId) }
                     .onFailure { t ->
-                        logger.e(t, "Failed to refresh details for %d", gameId)
+                        Timber.e(t, "Failed to refresh details for %d", gameId)
                         _uiState.update {
                             it.copy(
                                 isLoadingDetails = false,
@@ -144,7 +143,7 @@ class GameDetailsViewModel(
                 _uiState.update { it.copy(isLoadingMedia = true) }
                 runCatching { refreshMedia(gameId) }
                     .onFailure { t ->
-                        logger.w(t, "Failed to refresh media for %d", gameId)
+                        Timber.w(t, "Failed to refresh media for %d", gameId)
                         _uiState.update { it.copy(isLoadingMedia = false) }
                     }
             }
