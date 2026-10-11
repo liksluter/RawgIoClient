@@ -26,6 +26,7 @@ interface SearchHistoryDao {
     @Query("DELETE FROM search_history")
     suspend fun clearAll()
 
+    /** Оставляет в таблице `search_history` только кол-во записей [keep] */
     @Query(
         """
         DELETE FROM search_history

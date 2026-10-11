@@ -78,6 +78,5 @@ class SearchRepositoryImplTest {
         repository.clearHistory()
 
         coVerify { searchHistoryDao.clearAll() }
-        coVerify { gameDao.clearSearchEntriesExcept(emptyList()) }
     }
 }

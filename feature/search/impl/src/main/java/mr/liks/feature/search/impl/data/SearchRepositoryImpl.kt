@@ -78,7 +78,6 @@ class SearchRepositoryImpl(
         withContext(dispatchers.io) {
             database.withTransaction {
                 database.searchHistoryDao().clearAll()
-                database.gameDao().clearSearchEntriesExcept(emptyList())
             }
         }
     }

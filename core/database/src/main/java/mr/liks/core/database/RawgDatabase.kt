@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import mr.liks.core.database.dao.GameDao
 import mr.liks.core.database.dao.GameDetailsDao
+import mr.liks.core.database.dao.InternalGameDao
 import mr.liks.core.database.dao.RemoteKeyDao
 import mr.liks.core.database.dao.SearchHistoryDao
 import mr.liks.core.database.entity.DeveloperEntity
@@ -47,6 +48,7 @@ import mr.liks.core.database.entity.TrailerEntity
     exportSchema = true
 )
 abstract class RawgDatabase: RoomDatabase() {
+    abstract fun internalGameDao(): InternalGameDao
     abstract fun gameDao(): GameDao
     abstract fun remoteKeyDao(): RemoteKeyDao
     abstract fun searchHistoryDao(): SearchHistoryDao
