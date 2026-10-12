@@ -7,12 +7,11 @@ import androidx.media3.ui.PlayerView
 /** Контракт для управления [ExoPlayer] для экрана деталей */
 @Stable
 interface TrailerPlayerController {
-
     /** Привязывает плеер для [url] к переданному [PlayerView] */
     fun bindTo(view: PlayerView, url: String)
 
-    /** Отвязывает плеер от view, не освобождая ресурсы */
-    fun unbind()
+    /** Отвязывает плеер от [view], не освобождая ресурсы */
+    fun unbind(view: PlayerView)
 
     /** Пауза без освобождения ресурсов */
     fun pause()
