@@ -6,6 +6,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import java.lang.ref.WeakReference
 
 /**
  * Реализация [TrailerPlayerController]
@@ -14,36 +15,44 @@ import androidx.media3.ui.PlayerView
  */
 @OptIn(UnstableApi::class)
 internal class TrailerPlayerControllerImpl(
-    private val context: Context
+    context: Context
 ) : TrailerPlayerController {
+    private val appContext = context.applicationContext
+
     private var player: ExoPlayer? = null
     private var currentUrl: String? = null
+    private var attachedViewRef: WeakReference<PlayerView>? = null
+
+    private fun playerOrCreate(): ExoPlayer =
+        player ?: ExoPlayerFactory.createDetailPlayer(appContext).also { player = it }
 
     override fun bindTo(view: PlayerView, url: String) {
-        val existing = player
-        val target = if (existing != null && currentUrl == url) {
-            existing
-        } else {
-            existing?.release()
-            ExoPlayerFactory.createDetailPlayer(context).apply {
-                setMediaItem(MediaItem.fromUri(url))
-                prepare()
-                playWhenReady = true
-                player = this
-                currentUrl = url
-            }
+        val p = playerOrCreate()
+        val attached = attachedViewRef?.get()
+
+        if (attached === view && currentUrl == url) return
+
+        if (attached !== view) {
+            attached?.player = null
+            attachedViewRef = WeakReference(view)
+            view.player = p
         }
 
-        view.useController = true
-        view.setShowNextButton(false)
-        view.setShowPreviousButton(false)
-        view.setShowFastForwardButton(true)
-        view.setShowRewindButton(true)
-        view.player = target
+        if (currentUrl != url) {
+            currentUrl = url
+            p.setMediaItem(MediaItem.fromUri(url))
+            p.prepare()
+            p.playWhenReady = true
+        }
     }
 
-    override fun unbind() {
-        player?.pause()
+    override fun unbind(view: PlayerView) {
+        view.player = null
+
+        if (attachedViewRef?.get() === view) {
+            attachedViewRef = null
+            player?.pause()
+        }
     }
 
     override fun pause() { player?.pause() }
@@ -53,5 +62,7 @@ internal class TrailerPlayerControllerImpl(
         player?.release()
         player = null
         currentUrl = null
+        attachedViewRef?.get()?.player = null
+        attachedViewRef = null
     }
 }

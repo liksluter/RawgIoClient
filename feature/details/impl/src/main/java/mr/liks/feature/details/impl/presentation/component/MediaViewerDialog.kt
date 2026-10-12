@@ -84,11 +84,13 @@ fun MediaViewerDialog(
         ) {
             HorizontalPager(
                 state = pagerState,
+                key = { items[it].hashCode() },
                 modifier = Modifier.fillMaxSize()
             ) { page ->
                 val item = items[page]
+                val isActive = page == pagerState.currentPage
                 when (item) {
-                    is MediaItem.Trailer -> TrailerPage(item, playerController)
+                    is MediaItem.Trailer -> TrailerPage(item, isActive, playerController)
                     is MediaItem.Screenshot -> ScreenshotPage(item)
                 }
             }
@@ -113,6 +115,7 @@ fun MediaViewerDialog(
 @Composable
 private fun TrailerPage(
     item: MediaItem.Trailer,
+    isActive: Boolean,
     playerController: TrailerPlayerController
 ) {
     val url = item.value.playbackUrl
@@ -124,6 +127,7 @@ private fun TrailerPage(
     Box(modifier = Modifier.fillMaxSize()) {
         TrailerPlayer(
             url = url,
+            isActive = isActive,
             controller = playerController,
             modifier = Modifier.fillMaxSize()
         )

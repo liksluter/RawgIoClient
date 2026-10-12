@@ -36,6 +36,8 @@ object ExoPlayerFactory {
             .setMediaSourceFactory(
                 DefaultMediaSourceFactory(VideoCache.cacheDataSourceFactory(context))
             )
+            .setSeekForwardIncrementMs(SEEK_FORWARD_MS)
+            .setSeekBackIncrementMs(SEEK_BACK_MS)
             .build()
             .apply {
                 repeatMode = Player.REPEAT_MODE_OFF
@@ -49,4 +51,7 @@ object ExoPlayerFactory {
                 )
             }
     }
+
+    private const val SEEK_FORWARD_MS = 5_000L
+    private const val SEEK_BACK_MS = 5_000L
 }
