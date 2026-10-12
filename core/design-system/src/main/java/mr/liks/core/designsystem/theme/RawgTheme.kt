@@ -67,10 +67,9 @@ private val DarkColors = darkColorScheme(
 /**
  * Тема приложения
  *
- * @param themeMode режим из настроек: [ThemeMode.System], [ThemeMode.Light],
- *   [ThemeMode.Dark]. По умолчанию — [ThemeMode.System]
+ * @param themeMode режим темы: [ThemeMode.System], [ThemeMode.Light], [ThemeMode.Dark]
  * @param dynamicColor использовать ли Material You (Android 12+)
- * @param content содержимое.
+ * @param content содержимое
  */
 @Composable
 fun RawgTheme(
@@ -85,7 +84,6 @@ fun RawgTheme(
     }
 
     val colorScheme = when {
-        // В preview не подключаем динамические цвета — иначе рендер нестабилен.
         LocalInspectionMode.current -> if (darkTheme) DarkColors else LightColors
 
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
