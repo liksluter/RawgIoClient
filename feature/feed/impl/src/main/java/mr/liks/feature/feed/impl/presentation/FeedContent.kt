@@ -25,7 +25,7 @@ import mr.liks.core.designsystem.theme.RawgTheme
 import mr.liks.core.model.GamePreview
 import mr.liks.core.ui.component.ErrorFooter
 import mr.liks.core.ui.component.FeedEmpty
-import mr.liks.core.ui.component.FeedError
+import mr.liks.core.ui.component.ContentError
 import mr.liks.core.ui.component.FeedPlaceholder
 import mr.liks.core.ui.component.FeedPlaceholderCard
 import mr.liks.core.ui.component.LoadingFooter
@@ -63,7 +63,7 @@ internal fun FeedContent(
             }
 
             is LoadState.Error -> {
-                FeedError(
+                ContentError(
                     message = refresh.error.message ?: stringResource(R.string.feed_load_error_message),
                     onRetry = onRetry,
                     modifier = Modifier.fillMaxSize()

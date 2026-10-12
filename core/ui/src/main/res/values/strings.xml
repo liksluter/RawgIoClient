@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="on_load_error_default_message">Не удалось загрузить данные</string>
+    <string name="retry">Повторить</string>
+    <string name="feed_empty_default_message">Здесь пока ничего нет</string>
+</resources>

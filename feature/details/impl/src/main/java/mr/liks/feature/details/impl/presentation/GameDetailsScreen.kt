@@ -21,7 +21,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mr.liks.core.designsystem.theme.RawgTheme
-import mr.liks.core.ui.component.FeedError
+import mr.liks.core.ui.component.ContentError
 import mr.liks.feature.details.impl.R
 import mr.liks.feature.details.impl.presentation.component.DetailsHeader
 import mr.liks.feature.details.impl.presentation.component.GameDetailsPlaceholder
@@ -61,7 +61,7 @@ fun GameDetailsScreen(
         }
 
         uiState.details == null -> {
-            FeedError(
+            ContentError(
                 message = uiState.errorMessage
                     ?: stringResource(R.string.details_load_error_message),
                 onRetry = { viewModel.onIntent(GameDetailsIntent.Retry) },
