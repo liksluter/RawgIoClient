@@ -3,14 +3,14 @@ package mr.liks.core.network.api.dto
 import kotlinx.serialization.Serializable
 
 /**
- * Dto кол-ва добавления игры пользователем по типу
+ * Dto кол-ва добавления игры пользователями по типу
  *
- * @property yet
- * @property owned
- * @property beaten
- * @property toplay
- * @property dropped
- * @property playing
+ * @property yet в планах
+ * @property owned в коллекции
+ * @property beaten прошли
+ * @property toplay в списке желаемого
+ * @property dropped заброшено
+ * @property playing играют сейчас
  */
 @Serializable
 data class AddedByStatusDto(

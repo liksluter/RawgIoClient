@@ -12,7 +12,8 @@ interface RawgApi {
      *
      * @param page номер страницы
      * @param pageSize кол-во результатов на страницу
-     * @param sortOrder порядок сортировки
+     * @param sortOrder порядок сортировки [SortOrder]
+     * @param reverseSortOrder `true` - обратное направление сортировки
      * @return ответ со списком игр [GamesListResponse]
      */
     suspend fun getGames(

@@ -24,7 +24,6 @@ val NetworkModule = module {
     single {
         val config = RawgHttpClientConfig(
             baseUrl = BuildConfig.BASE_URL,
-            apiKeyName = "key",
             apiKey = BuildConfig.RAWG_API_KEY,
             isDebug = BuildConfig.DEBUG
         )
