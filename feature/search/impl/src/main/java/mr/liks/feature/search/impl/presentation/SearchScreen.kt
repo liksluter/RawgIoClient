@@ -35,7 +35,7 @@ import mr.liks.core.model.GamePreview
 import mr.liks.core.model.SearchHistoryItem
 import mr.liks.core.ui.component.ErrorFooter
 import mr.liks.core.ui.component.FeedEmpty
-import mr.liks.core.ui.component.FeedError
+import mr.liks.core.ui.component.ContentError
 import mr.liks.core.ui.component.LoadingFooter
 import mr.liks.feature.search.impl.R
 import mr.liks.feature.search.impl.presentation.component.SearchHistoryRow
@@ -183,7 +183,7 @@ private fun ResultsContent(
         }
 
         is LoadState.Error -> {
-            FeedError(
+            ContentError(
                 message = refresh.error.message ?: stringResource(R.string.search_error_message),
                 onRetry = { results.retry() },
                 modifier = modifier.fillMaxSize()

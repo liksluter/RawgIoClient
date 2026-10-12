@@ -12,11 +12,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mr.liks.core.designsystem.icon.RawgIcons
 import mr.liks.core.designsystem.theme.RawgTheme
+import mr.liks.core.ui.R
 
 /**
  * Полноэкранная ошибка загрузки ленты
@@ -25,7 +27,7 @@ import mr.liks.core.designsystem.theme.RawgTheme
  * @param onRetry колбэк повтора
  */
 @Composable
-fun FeedError(
+fun ContentError(
     message: String,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
@@ -56,15 +58,15 @@ fun FeedError(
         )
 
         Button(onClick = onRetry) {
-            Text("Повторить")
+            Text(stringResource(R.string.retry))
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun FeedErrorPreview() {
-    FeedError(
+private fun ContentErrorPreview() {
+    ContentError(
         message = "Не удалось загрузить ленту. Проверьте подключение.",
         onRetry = {}
     )
