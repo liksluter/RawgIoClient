@@ -15,7 +15,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -31,6 +34,8 @@ import kotlinx.coroutines.launch
 import mr.liks.core.navigation.AppNavigator
 import mr.liks.core.navigation.AppRoute
 import mr.liks.core.navigation.TopLevelRoute
+import mr.liks.core.ui.snackbar.LocalSnackbarController
+import mr.liks.core.ui.snackbar.SnackbarController
 import mr.liks.rawgioclient.R
 import mr.liks.rawgioclient.navigation.NavigationConfiguration
 import mr.liks.rawgioclient.presentation.component.BottomBar
@@ -50,6 +55,11 @@ fun MainScreen(modifier: Modifier = Modifier) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarController = remember(snackbarHostState) {
+        SnackbarController(snackbarHostState)
+    }
 
     val thresholdPx = remember(density) {
         with(density) { (TopBarExpandedHeight - TopBarCollapsedHeight).toPx() }
@@ -72,49 +82,52 @@ fun MainScreen(modifier: Modifier = Modifier) {
     val showTopBar = (currentRoute as AppRoute).shouldShowTopBar()
     val showBottomBar = currentRoute.shouldShowBottomBar()
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
-        bottomBar = {
-            if (showBottomBar) {
-                BottomBar(
-                    currentRoute = currentRoute,
-                    onTabSelected = { navigator.switchTab(it) },
-                )
-            }
-        },
-        floatingActionButton = {
-            AnimatedVisibility(
-                visible = showScrollToTop && navigator.currentRoute == TopLevelRoute.Feed,
-                enter = fadeIn() + scaleIn(),
-                exit = fadeOut() + scaleOut(),
-            ) {
-                SmallFloatingActionButton(
-                    onClick = { scope.launch { listState.animateScrollToItem(0) } },
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                ) {
-                    Icon(Icons.Filled.KeyboardArrowUp, contentDescription = stringResource(R.string.back_to_start))
+    CompositionLocalProvider(LocalSnackbarController provides snackbarController) {
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            containerColor = MaterialTheme.colorScheme.background,
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+            bottomBar = {
+                if (showBottomBar) {
+                    BottomBar(
+                        currentRoute = currentRoute,
+                        onTabSelected = { navigator.switchTab(it) },
+                    )
                 }
-            }
-        },
-    ) { innerPadding ->
-        Box(modifier = Modifier.fillMaxSize()) {
-            MainNavHost(
-                navigator = navigator,
-                hazeState = hazeState,
-                listState = listState,
-                contentPadding = innerPadding,
-                modifier = Modifier.fillMaxSize(),
-            )
-
-            if (showTopBar) {
-                CollapsibleTopBar(
-                    title = stringResource(R.string.app_name),
-                    collapseFraction = collapseFraction,
+            },
+            floatingActionButton = {
+                AnimatedVisibility(
+                    visible = showScrollToTop && navigator.currentRoute == TopLevelRoute.Feed,
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut(),
+                ) {
+                    SmallFloatingActionButton(
+                        onClick = { scope.launch { listState.animateScrollToItem(0) } },
+                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    ) {
+                        Icon(Icons.Filled.KeyboardArrowUp, contentDescription = stringResource(R.string.back_to_start))
+                    }
+                }
+            },
+        ) { innerPadding ->
+            Box(modifier = Modifier.fillMaxSize()) {
+                MainNavHost(
+                    navigator = navigator,
                     hazeState = hazeState,
-                    modifier = Modifier.align(Alignment.TopCenter),
+                    listState = listState,
+                    contentPadding = innerPadding,
+                    modifier = Modifier.fillMaxSize(),
                 )
+
+                if (showTopBar) {
+                    CollapsibleTopBar(
+                        title = stringResource(R.string.app_name),
+                        collapseFraction = collapseFraction,
+                        hazeState = hazeState,
+                        modifier = Modifier.align(Alignment.TopCenter),
+                    )
+                }
             }
         }
     }

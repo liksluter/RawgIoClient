@@ -37,6 +37,7 @@ import mr.liks.core.ui.component.ErrorFooter
 import mr.liks.core.ui.component.FeedEmpty
 import mr.liks.core.ui.component.ContentError
 import mr.liks.core.ui.component.LoadingFooter
+import mr.liks.core.ui.snackbar.LocalSnackbarController
 import mr.liks.feature.search.impl.R
 import mr.liks.feature.search.impl.presentation.component.SearchHistoryRow
 import mr.liks.feature.search.impl.presentation.component.SearchResultItem
@@ -49,6 +50,7 @@ fun SearchScreen(
     modifier: Modifier = Modifier,
     viewModel: SearchViewModel = koinViewModel()
 ) {
+    val snackbarController = LocalSnackbarController.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val results = viewModel.results.collectAsLazyPagingItems()
 
@@ -56,7 +58,12 @@ fun SearchScreen(
         viewModel.effects.collect { effect ->
             when (effect) {
                 is SearchEffect.NavigateToDetails -> onGameClick(effect.gameId)
-                is SearchEffect.ShowSnackbar -> Unit
+                is SearchEffect.ShowSnackbar -> {
+                    snackbarController.show(
+                        message = effect.message,
+                        withDismissAction = true,
+                    )
+                }
             }
         }
     }

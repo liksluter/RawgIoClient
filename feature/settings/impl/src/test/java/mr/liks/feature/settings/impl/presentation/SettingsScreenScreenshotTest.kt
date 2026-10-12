@@ -1,6 +1,9 @@
 package mr.liks.feature.settings.impl.presentation
 
 import androidx.activity.ComponentActivity
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onRoot
 import com.github.takahirom.roborazzi.captureRoboImage
@@ -15,6 +18,8 @@ import kotlinx.coroutines.test.setMain
 import mr.liks.core.designsystem.theme.RawgTheme
 import mr.liks.core.model.AppSettings
 import mr.liks.core.model.ThemeMode
+import mr.liks.core.ui.snackbar.LocalSnackbarController
+import mr.liks.core.ui.snackbar.SnackbarController
 import mr.liks.feature.settings.impl.domain.usecase.GetAppSettingsUseCase
 import org.junit.After
 import org.junit.Before
@@ -65,8 +70,15 @@ class SettingsScreenScreenshotTest {
         )
 
         composeRule.setContent {
-            RawgTheme {
-                SettingsScreen(viewModel = viewModel)
+            val snackbarHostState = remember { SnackbarHostState() }
+            val snackbarController = remember(snackbarHostState) {
+                SnackbarController(snackbarHostState)
+            }
+
+            CompositionLocalProvider(LocalSnackbarController provides snackbarController) {
+                RawgTheme {
+                    SettingsScreen(viewModel = viewModel)
+                }
             }
         }
 

@@ -23,7 +23,6 @@ android {
     }
 }
 
-// todo отрефакторить на этапе рабочего MVP
 tasks.withType<Test> {
     exclude("**/DatabaseTest.class")
 }

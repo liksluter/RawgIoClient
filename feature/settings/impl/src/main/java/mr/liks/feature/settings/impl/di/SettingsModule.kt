@@ -11,6 +11,7 @@ import mr.liks.feature.settings.impl.domain.usecase.SetThemeUseCase
 import mr.liks.feature.settings.impl.presentation.SettingsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val SettingsModule = module {
@@ -39,6 +40,9 @@ val SettingsModule = module {
             getCacheSize = get(),
             clearCache = get(),
             stringProvider = get(),
+            appVersion = get(named(VERSION_NAME_QUALIFIER_NAME))
         )
     }
 }
+
+const val VERSION_NAME_QUALIFIER_NAME = "version_name"

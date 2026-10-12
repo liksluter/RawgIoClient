@@ -41,7 +41,7 @@ class SettingsViewModel(
     private val getCacheSize: GetCacheSizeUseCase,
     private val clearCache: ClearCacheUseCase,
     private val stringProvider: StringProvider,
-    private val appVersion: String = "0.0.1", // todo передавать версию из BuildConfig
+    private val appVersion: String,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         SettingsUiState(

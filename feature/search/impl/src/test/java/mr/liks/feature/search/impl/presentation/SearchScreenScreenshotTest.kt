@@ -1,5 +1,8 @@
 package mr.liks.feature.search.impl.presentation
 
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.paging.PagingData
@@ -12,6 +15,8 @@ import kotlinx.coroutines.flow.flowOf
 import mr.liks.core.designsystem.theme.RawgTheme
 import mr.liks.core.model.GamePreview
 import mr.liks.core.model.SearchHistoryItem
+import mr.liks.core.ui.snackbar.LocalSnackbarController
+import mr.liks.core.ui.snackbar.SnackbarController
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,8 +46,15 @@ class SearchScreenScreenshotTest {
         every { viewModel.effects } returns emptyFlow()
 
         composeRule.setContent {
-            RawgTheme {
-                SearchScreen(onGameClick = {}, viewModel = viewModel)
+            val snackbarHostState = remember { SnackbarHostState() }
+            val snackbarController = remember(snackbarHostState) {
+                SnackbarController(snackbarHostState)
+            }
+
+            CompositionLocalProvider(LocalSnackbarController provides snackbarController) {
+                RawgTheme {
+                    SearchScreen(onGameClick = {}, viewModel = viewModel)
+                }
             }
         }
 
@@ -70,8 +82,15 @@ class SearchScreenScreenshotTest {
         every { viewModel.effects } returns emptyFlow()
 
         composeRule.setContent {
-            RawgTheme {
-                SearchScreen(onGameClick = {}, viewModel = viewModel)
+            val snackbarHostState = remember { SnackbarHostState() }
+            val snackbarController = remember(snackbarHostState) {
+                SnackbarController(snackbarHostState)
+            }
+
+            CompositionLocalProvider(LocalSnackbarController provides snackbarController) {
+                RawgTheme {
+                    SearchScreen(onGameClick = {}, viewModel = viewModel)
+                }
             }
         }
 

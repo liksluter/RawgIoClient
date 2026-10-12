@@ -25,6 +25,7 @@ import mr.liks.feature.settings.impl.presentation.component.CacheSizeRow
 import mr.liks.feature.settings.impl.presentation.component.SettingsToggleRow
 import org.koin.androidx.compose.koinViewModel
 import androidx.core.net.toUri
+import mr.liks.core.ui.snackbar.LocalSnackbarController
 import mr.liks.feature.settings.impl.R
 
 /** Экран настроек */
@@ -35,6 +36,7 @@ fun SettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val snackbarController = LocalSnackbarController.current
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
@@ -43,7 +45,12 @@ fun SettingsScreen(
                     val intent = Intent(Intent.ACTION_VIEW, effect.url.toUri())
                     runCatching { context.startActivity(intent) }
                 }
-                is SettingsEffect.ShowSnackbar -> Unit // TODO: snackbar host
+                is SettingsEffect.ShowSnackbar -> {
+                    snackbarController.show(
+                        message = effect.message,
+                        withDismissAction = true,
+                    )
+                }
             }
         }
     }

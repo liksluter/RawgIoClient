@@ -59,7 +59,7 @@ class CacheSizeRowTest {
     }
 
     @Test
-    fun `shows progress indicator when clearing`() {
+    fun `clear button disabled when clearing`() {
         composeRule.setContent {
             CacheSizeRow(
                 sizeBytes = 1024L,
@@ -68,7 +68,7 @@ class CacheSizeRowTest {
             )
         }
 
-        composeRule.onNodeWithText("Очистить").assertDoesNotExist()
+        composeRule.onNodeWithText("Очистить").assertIsNotEnabled()
     }
 
     @Test
