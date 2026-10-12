@@ -16,6 +16,7 @@ import mr.liks.feature.settings.impl.domain.usecase.GetAppSettingsUseCase
 class ThemeViewModel(
     getAppSettings: GetAppSettingsUseCase
 ) : ViewModel() {
+    /** Состояние темы [ThemeState] */
     val themeState: StateFlow<ThemeState> = getAppSettings()
         .map { settings ->
             ThemeState(

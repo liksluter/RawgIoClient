@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">RawgIo Client</string>
+    <string name="back_to_start">К началу</string>
 </resources>
