@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mr.liks.core.navigation.AppRoute
 import mr.liks.core.navigation.TopLevelRouteInfo
@@ -49,6 +50,7 @@ fun BottomBar(
     ) {
         TopLevelRouteInfo.ordered.forEach { tab ->
             val selected = currentRoute == tab.route
+            val labelText = stringResource(tab.labelId)
             NavigationBarItem(
                 selected = selected,
                 onClick = {
@@ -57,11 +59,11 @@ fun BottomBar(
                 icon = {
                     Icon(
                         imageVector = tab.icon,
-                        contentDescription = tab.label,
+                        contentDescription = labelText,
                         modifier = Modifier.size(24.dp)
                     )
                 },
-                label = { Text(tab.label) },
+                label = { Text(labelText) },
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = MaterialTheme.colorScheme.primaryContainer
                         .copy(alpha = 0.55f),

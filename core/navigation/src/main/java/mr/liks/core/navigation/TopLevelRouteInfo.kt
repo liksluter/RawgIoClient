@@ -10,31 +10,31 @@ import androidx.compose.ui.graphics.vector.ImageVector
  * Top-level маршруты, которые показываются в нижнем тулбаре
  *
  * @property route маршрут
- * @property label метка
+ * @property labelId res id метки
  * @property icon иконка
  * @property order порядок
  */
 enum class TopLevelRouteInfo(
     val route: AppRoute,
-    val label: String,
+    val labelId: Int,
     val icon: ImageVector,
     val order: Int
 ) {
     FEED(
         route = TopLevelRoute.Feed,
-        label = "Лента",
+        labelId = R.string.feed,
         icon = Icons.Filled.Home,
         order = 0
     ),
     SEARCH(
         route = TopLevelRoute.Search,
-        label = "Поиск",
+        labelId = R.string.search,
         icon = Icons.Filled.Search,
         order = 1
     ),
     SETTINGS(
         route = TopLevelRoute.Settings,
-        label = "Настройки",
+        labelId = R.string.settings,
         icon = Icons.Filled.Settings,
         order = 2
     );
