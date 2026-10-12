@@ -94,7 +94,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
                     containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 ) {
-                    Icon(Icons.Filled.KeyboardArrowUp, contentDescription = "К началу")
+                    Icon(Icons.Filled.KeyboardArrowUp, contentDescription = stringResource(R.string.back_to_start))
                 }
             }
         },
