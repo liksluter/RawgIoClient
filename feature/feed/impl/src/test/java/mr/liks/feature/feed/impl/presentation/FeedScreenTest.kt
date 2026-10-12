@@ -2,9 +2,14 @@ package mr.liks.feature.feed.impl.presentation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.test.junit4.createComposeRule
 import dev.chrisbanes.haze.HazeState
 import io.mockk.mockk
+import mr.liks.core.ui.snackbar.LocalSnackbarController
+import mr.liks.core.ui.snackbar.SnackbarController
 import org.junit.Rule
 import org.junit.Test
 import org.koin.core.context.startKoin
@@ -50,12 +55,19 @@ class FeedScreenTest {
     @Test
     fun `screen renders without crash`() {
         composeRule.setContent {
-            FeedScreen(
-                onGameClick = {},
-                hazeState = HazeState(),
-                listState = LazyListState(),
-                contentPadding = PaddingValues()
-            )
+            val snackbarHostState = remember { SnackbarHostState() }
+            val snackbarController = remember(snackbarHostState) {
+                SnackbarController(snackbarHostState)
+            }
+
+            CompositionLocalProvider(LocalSnackbarController provides snackbarController) {
+                FeedScreen(
+                    onGameClick = {},
+                    hazeState = HazeState(),
+                    listState = LazyListState(),
+                    contentPadding = PaddingValues()
+                )
+            }
         }
         composeRule.waitForIdle()
     }

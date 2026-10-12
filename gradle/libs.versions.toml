@@ -11,6 +11,8 @@ kotlinx-coroutines = "1.10.2"
 compileSdk = "36"
 targetSdk = "36"
 minSdk = "24"
+appVersionCode = "1"
+appVersionName = "0.0.1"
 
 # AndroidX
 coreKtx = "1.18.0"

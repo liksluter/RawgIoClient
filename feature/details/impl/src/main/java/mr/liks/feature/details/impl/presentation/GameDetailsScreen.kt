@@ -22,6 +22,7 @@ import androidx.core.text.HtmlCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mr.liks.core.designsystem.theme.RawgTheme
 import mr.liks.core.ui.component.ContentError
+import mr.liks.core.ui.snackbar.LocalSnackbarController
 import mr.liks.feature.details.impl.R
 import mr.liks.feature.details.impl.presentation.component.DetailsHeader
 import mr.liks.feature.details.impl.presentation.component.GameDetailsPlaceholder
@@ -37,13 +38,19 @@ fun GameDetailsScreen(
     onBack: () -> Unit,
     viewModel: GameDetailsViewModel = koinViewModel()
 ) {
+    val snackbarController = LocalSnackbarController.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
                 GameDetailsEffect.NavigateBack -> onBack()
-                is GameDetailsEffect.ShowSnackbar -> Unit // todo
+                is GameDetailsEffect.ShowSnackbar -> {
+                    snackbarController.show(
+                        message = effect.message,
+                        withDismissAction = true,
+                    )
+                }
             }
         }
     }

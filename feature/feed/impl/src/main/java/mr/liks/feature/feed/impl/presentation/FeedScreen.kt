@@ -12,6 +12,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import dev.chrisbanes.haze.HazeState
 import mr.liks.core.model.GamePreview
+import mr.liks.core.ui.snackbar.LocalSnackbarController
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -23,6 +24,7 @@ fun FeedScreen(
     modifier: Modifier = Modifier,
     viewModel: FeedViewModel = koinViewModel()
 ) {
+    val snackbarController = LocalSnackbarController.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val games: LazyPagingItems<GamePreview> = viewModel.feed.collectAsLazyPagingItems()
 
@@ -30,7 +32,12 @@ fun FeedScreen(
         viewModel.effects.collect { effect ->
             when (effect) {
                 is FeedEffect.NavigateToDetails -> onGameClick(effect.gameId)
-                is FeedEffect.ShowSnackbar -> Unit // TODO: snackbar host
+                is FeedEffect.ShowSnackbar -> {
+                    snackbarController.show(
+                        message = effect.message,
+                        withDismissAction = true,
+                    )
+                }
             }
         }
     }

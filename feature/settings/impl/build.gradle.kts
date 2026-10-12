@@ -23,6 +23,9 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {
@@ -30,6 +33,7 @@ dependencies {
 
     implementation(project(":core:model"))
     implementation(project(":core:datastore"))
+    implementation(project(":core:ui"))
 
     implementation(libs.androidx.datastore.preferences)
 

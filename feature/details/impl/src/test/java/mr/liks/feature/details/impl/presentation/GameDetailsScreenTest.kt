@@ -1,6 +1,9 @@
 package mr.liks.feature.details.impl.presentation
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -12,6 +15,8 @@ import kotlinx.coroutines.flow.emptyFlow
 import mr.liks.core.designsystem.theme.RawgTheme
 import mr.liks.core.media.TrailerPlayerController
 import mr.liks.core.model.GameDetails
+import mr.liks.core.ui.snackbar.LocalSnackbarController
+import mr.liks.core.ui.snackbar.SnackbarController
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -75,13 +80,19 @@ class GameDetailsScreenTest {
 
     private fun setScreenContent(viewModel: GameDetailsViewModel) {
         composeTestRule.setContent {
-            RawgTheme {
-                GameDetailsScreen(
-                    gameId = 1L,
-                    contentPadding = PaddingValues(),
-                    onBack = {},
-                    viewModel = viewModel
-                )
+            val snackbarHostState = remember { SnackbarHostState() }
+            val snackbarController = remember(snackbarHostState) {
+                SnackbarController(snackbarHostState)
+            }
+            CompositionLocalProvider(LocalSnackbarController provides snackbarController) {
+                RawgTheme {
+                    GameDetailsScreen(
+                        gameId = 1L,
+                        contentPadding = PaddingValues(),
+                        onBack = {},
+                        viewModel = viewModel
+                    )
+                }
             }
         }
     }

@@ -26,8 +26,8 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 defaultConfig {
                     minSdk = libs.findVersion("minSdk").get().requiredVersion.toInt()
                     targetSdk = libs.findVersion("targetSdk").get().requiredVersion.toInt()
-                    versionCode = 1
-                    versionName = "0.0.1"
+                    versionCode = libs.findVersion("appVersionCode").get().requiredVersion.toInt()
+                    versionName = libs.findVersion("appVersionName").get().requiredVersion
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 }
 
