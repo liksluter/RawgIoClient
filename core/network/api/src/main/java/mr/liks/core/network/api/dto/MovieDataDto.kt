@@ -6,8 +6,8 @@ import kotlinx.serialization.Serializable
 /**
  * Dto ведеоролика
  *
- * @property data480
- * @property max
+ * @property data480 данные видео
+ * @property max макс размер
  */
 @Serializable
 data class MovieDataDto(

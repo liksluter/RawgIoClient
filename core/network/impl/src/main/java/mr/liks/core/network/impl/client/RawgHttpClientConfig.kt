@@ -13,10 +13,14 @@ package mr.liks.core.network.impl.client
  */
 data class RawgHttpClientConfig(
     val baseUrl: String,
-    val apiKeyName: String,
+    val apiKeyName: String  = API_KEY_NAME,
     val apiKey: String,
     val requestTimeout: Long = 30_000L,
     val connectTimeout: Long = 15_000L,
     val socketTimeout: Long = 30_000L,
     val isDebug: Boolean,
-)
+) {
+    companion object {
+        private const val API_KEY_NAME = "key"
+    }
+}

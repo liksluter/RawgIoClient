@@ -7,6 +7,8 @@ import kotlinx.serialization.Serializable
  *
  * @property platform dto платформы
  * @property releasedAt время выхода игры под текущую платформу
+ * @property requirementsEn системные требования на английском
+ * @property requirementsRu системные требования на русском
  */
 @Serializable
 data class PlatformWrapperDto(

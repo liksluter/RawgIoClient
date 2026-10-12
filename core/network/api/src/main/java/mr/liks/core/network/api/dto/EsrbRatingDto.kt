@@ -8,6 +8,8 @@ import kotlinx.serialization.Serializable
  * @property id id
  * @property name название
  * @property slug слаг
+ * @property nameEn название на английском
+ * @property nameRu название на русском
  */
 @Serializable
 data class EsrbRatingDto(
